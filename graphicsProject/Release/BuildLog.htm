@@ -1,0 +1,72 @@
+<html>
+<head>
+<META HTTP-EQUIV="Content-Type" content="text/html; charset=Windows-1252">
+</head>
+<body>
+<pre>
+<table width=100% bgcolor=#CFCFE5><tr> <td> <font face=arial size=+3>
+Build Log
+</font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>
+<h3>------- Build started: Project: OpenGL Framework, Configuration: Release|Win32 -------
+</h3>
+</pre></table><table width=100% bgcolor=#DFDFE5><tr><td><font face=arial size=+2>
+Command Lines
+</font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>Creating temporary file "e:\DanRhodes\OpenGL - Fourier Textures\Release\RSP00000B.rsp" with contents
+[
+/O2 /AI "E:\DanRhodes\OpenGL - Fourier Textures\Release" /D "WIN32" /D "NDEBUG" /D "_MBCS" /FD /EHsc /MT /GS /Fo"Release/" /Fd"Release/vc70.pdb" /W3 /c /Zi /clr /TP
+".\main.cpp"
+]
+Creating command line "cl.exe @"e:\DanRhodes\OpenGL - Fourier Textures\Release\RSP00000B.rsp" /nologo"
+Creating temporary file "e:\DanRhodes\OpenGL - Fourier Textures\Release\RSP00000C.rsp" with contents
+[
+/OUT:"E:\DanRhodes\OpenGL - Fourier Textures\Release\OpenGL Framework.exe" /INCREMENTAL:NO /NOLOGO /DEBUG /PDB:"E:\DanRhodes\OpenGL - Fourier Textures\Release/OpenGL Framework.pdb" /FIXED:No  kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib
+".\release\main.obj"
+]
+Creating command line "link.exe @"e:\DanRhodes\OpenGL - Fourier Textures\Release\RSP00000C.rsp""
+</pre></table><table width=100% bgcolor=#DFDFE5><tr><td><font face=arial size=+2>
+Output Window
+</font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>Compiling...
+main.cpp
+main.cpp(1379) : warning C4305: '-=' : truncation from 'double' to 'float'
+main.cpp(1380) : warning C4305: '-=' : truncation from 'double' to 'float'
+main.cpp(1386) : warning C4305: '+=' : truncation from 'double' to 'float'
+main.cpp(1387) : warning C4305: '+=' : truncation from 'double' to 'float'
+Linking...
+main.obj : error LNK2001: unresolved external symbol "int (__stdcall*__stdcall wglGetProcAddress(char const *))(void)" (?wglGetProcAddress@@$$J14YGP6GHXZPBD@Z)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glDeleteTextures(int,unsigned int const *)" (?glDeleteTextures@@$$J18YGXHPBI@Z)
+main.obj : error LNK2001: unresolved external symbol "unsigned char const * __stdcall gluErrorString(unsigned int)" (?gluErrorString@@$$J14YGPBEI@Z)
+main.obj : error LNK2001: unresolved external symbol "unsigned int __stdcall glGetError(void)" (?glGetError@@$$J10YGIXZ)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glReadPixels(int,int,int,int,unsigned int,unsigned int,void *)" (?glReadPixels@@$$J228YGXHHHHIIPAX@Z)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glReadBuffer(unsigned int)" (?glReadBuffer@@$$J14YGXI@Z)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glEnd(void)" (?glEnd@@$$J10YGXXZ)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glVertex3f(float,float,float)" (?glVertex3f@@$$J212YGXMMM@Z)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glTexCoord2f(float,float)" (?glTexCoord2f@@$$J18YGXMM@Z)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glBegin(unsigned int)" (?glBegin@@$$J14YGXI@Z)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glRotatef(float,float,float,float)" (?glRotatef@@$$J216YGXMMMM@Z)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glTranslatef(float,float,float)" (?glTranslatef@@$$J212YGXMMM@Z)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glBindTexture(unsigned int,unsigned int)" (?glBindTexture@@$$J18YGXII@Z)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glEnable(unsigned int)" (?glEnable@@$$J14YGXI@Z)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glMatrixMode(unsigned int)" (?glMatrixMode@@$$J14YGXI@Z)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glLoadIdentity(void)" (?glLoadIdentity@@$$J10YGXXZ)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall gluPerspective(double,double,double,double)" (?gluPerspective@@$$J232YGXNNNN@Z)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glClear(unsigned int)" (?glClear@@$$J14YGXI@Z)
+main.obj : error LNK2001: unresolved external symbol "unsigned char const * __stdcall glGetString(unsigned int)" (?glGetString@@$$J14YGPBEI@Z)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glTexImage2D(unsigned int,int,int,int,int,int,unsigned int,unsigned int,void const *)" (?glTexImage2D@@$$J236YGXIHHHHHIIPBX@Z)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glTexParameteri(unsigned int,unsigned int,int)" (?glTexParameteri@@$$J212YGXIIH@Z)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glGenTextures(int,unsigned int *)" (?glGenTextures@@$$J18YGXHPAI@Z)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glHint(unsigned int,unsigned int)" (?glHint@@$$J18YGXII@Z)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glDepthFunc(unsigned int)" (?glDepthFunc@@$$J14YGXI@Z)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glClearDepth(double)" (?glClearDepth@@$$J18YGXN@Z)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glShadeModel(unsigned int)" (?glShadeModel@@$$J14YGXI@Z)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glClearColor(float,float,float,float)" (?glClearColor@@$$J216YGXMMMM@Z)
+main.obj : error LNK2001: unresolved external symbol "void __stdcall glViewport(int,int,int,int)" (?glViewport@@$$J216YGXHHHH@Z)
+main.obj : error LNK2001: unresolved external symbol "int __stdcall wglDeleteContext(struct HGLRC__ *)" (?wglDeleteContext@@$$J14YGHPAUHGLRC__@@@Z)
+main.obj : error LNK2001: unresolved external symbol "int __stdcall wglMakeCurrent(struct HDC__ *,struct HGLRC__ *)" (?wglMakeCurrent@@$$J18YGHPAUHDC__@@PAUHGLRC__@@@Z)
+main.obj : error LNK2001: unresolved external symbol "struct HGLRC__ * __stdcall wglCreateContext(struct HDC__ *)" (?wglCreateContext@@$$J14YGPAUHGLRC__@@PAUHDC__@@@Z)
+E:\DanRhodes\OpenGL - Fourier Textures\Release\OpenGL Framework.exe : fatal error LNK1120: 31 unresolved externals
+</pre></table><table width=100% bgcolor=#DFDFE5><tr><td><font face=arial size=+2>
+Results
+</font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>
+Build log was saved at "file://e:\DanRhodes\OpenGL - Fourier Textures\Release\BuildLog.htm"
+OpenGL Framework - 32 error(s), 4 warning(s)</pre></table><table   width=100% height=20 bgcolor=#CFCFE5><tr><td><font face=arial size=+2>
+</font></table></body></html>

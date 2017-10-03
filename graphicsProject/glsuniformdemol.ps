@@ -1,0 +1,121 @@
+#version 150
+//uniform float shade;//not used at present
+uniform sampler2D mytexture;
+uniform sampler2D mynormal;
+//uniform vec3 ambient;//for later
+
+in vec3 cshade;
+in vec3 v_o;
+in vec3 pos;
+in vec3 locallight_o;
+in vec3 n;
+
+in vec2 tc_out;
+
+out vec4 pixelcolour;
+
+//uniform vec2 TexMapSize;
+
+float getLOD( vec2 dtx, vec2 dty );
+float frexp( float x, out float e );
+vec4 bilinear(int LOD,vec2 tcoords);
+
+void main( )
+{
+	float shadescale;
+	vec3 vn,l,ln,nn,h;
+	vec3 textureshade;
+	vec3 normalshade, nmn;
+
+	vec2 dtx = dFdx( tc_out );
+	vec2 dty = dFdy( tc_out );
+
+	float fLOD=getLOD(dtx,dty);
+	int iLOD=int(floor(fLOD));
+	float fracLOD= fLOD-iLOD;
+	
+
+//textureshade = (bilinear(iLOD,tc_out)*(1.0-fracLOD)+bilinear(iLOD+1,tc_out)*fracLOD).rgb;
+//	textureshade = bilinear(iLOD,tc_out).rgb;
+//	textureshade=texelFetch(mytexture,ivec2(tc_out)>>iLOD,iLOD).rgb;
+
+	textureshade=texelFetch(mytexture,ivec2(tc_out),0).rgb;
+	normalshade= (2*texelFetch(mynormal,ivec2(tc_out),0).rgb) - 1;
+
+	vn=normalize(cross(-v_o , normalshade));
+
+  	ln=normalize(locallight_o);
+
+	h=vn-ln;//light direction shines from source to object
+    
+	h=normalize(h); 
+    
+	nn=normalize(n);
+    
+	shadescale= dot(h,nn);//inward normal
+
+    if (shadescale<0)
+		shadescale=0;
+
+    shadescale*=shadescale;
+	shadescale*=shadescale;
+
+	float diffuseshadescale=dot(-ln,nn);
+	if (diffuseshadescale<0)diffuseshadescale=0;
+		
+	// Get pixel colour from input shade
+	pixelcolour = vec4( cshade*shadescale+ textureshade*diffuseshadescale, 1.0 );
+
+		
+	
+}
+float frexp( float x, out float e )
+{
+   e = ceil( log2( x ) );
+   return( x * exp2( -e ) );
+}
+
+float getLOD( vec2 dtx, vec2 dty )
+{
+	// Get partial derivates
+
+
+	// Work out diagonals
+	float fTx = dtx.x + dty.x;
+	float fTy = dtx.y + dty.y;
+	float fXd = fTx * fTx + fTy * fTy;
+	//fXd is first diagonal distance (1,1)
+	fTx = dtx.x - dty.x;
+	fTy = dtx.y - dty.y;
+	float fYd = fTx * fTx + fTy * fTy;
+	//fYd is second diagonal distance (1,-1)
+
+	float fpixelDiff = max( fXd, fYd );
+
+	
+	// Work out Level of Detail & compensate for not taking square root
+	float LOD = log2( fpixelDiff / 2 ) / 2;
+
+	LOD = max(LOD, 0.0);
+	return (LOD);
+}
+vec4 bilinear(int LOD,vec2 tcoords)
+{
+	vec2 cscal=(tcoords)*exp2(-LOD);//get the lower value note that his will mpy x by x and y by y
+	vec2 lo=floor(cscal);//get the lower value note that his will mpy x by x and y by y
+	vec2 frac=cscal-lo;
+	float w0=frac.x*frac.y;
+	float w1=(1.0-frac.x)*frac.y;
+	float w2=frac.x*(1.0-frac.y);
+	float w3=(1.0-frac.x)*(1.0-frac.y);
+	ivec2 cd=ivec2(lo);
+	vec4 c3= texelFetch(mytexture,cd,LOD) *w3;
+	cd.x+=1;//increment by 1 scaled texel
+	vec4 c2= texelFetch(mytexture,cd,LOD)*w2;
+	cd.y+=1;//increment by 1 scaled texel
+	
+	vec4 c0= texelFetch(mytexture,cd,LOD)*w0;
+	cd.x-=1;//now undo the x to get the last one
+	vec4 c1= texelFetch(mytexture,cd,LOD)*w1;
+	return c3+c1+c2+c0;
+}

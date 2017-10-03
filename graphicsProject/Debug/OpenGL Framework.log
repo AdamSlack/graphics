@@ -1,0 +1,61 @@
+﻿Build started 11/11/2013 11:35:20.
+     1>Project "C:\Users\cmp3cantrj\Desktop\OpenGL glsltexdemo-mod32\OpenGL Framework.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /Igl_include /AI"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0" /AI"C:\Program Files (x86)\Windows Kits\8.0\References\CommonConfiguration\Neutral" /Zi /clr:oldSyntax /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _VC80_UPGRADE=0x0710 /D _MBCS /Gm- /EHa /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /FR"Debug\\" /TP /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\mscorlib.dll" /analyze- /errorReport:prompt /clr:nostdlib main.cpp
+     1>cl : Command line warning D9035: option 'clr:oldsyntax' has been deprecated and will be removed in a future release
+         main.cpp
+     1>main.cpp(226): warning C4305: 'initializing' : truncation from 'double' to 'float'
+     1>main.cpp(378): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\stdio.h(311) : see declaration of 'sscanf'
+     1>main.cpp(417): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\stdio.h(357) : see declaration of 'sprintf'
+     1>main.cpp(650): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\stdio.h(311) : see declaration of 'sscanf'
+     1>main.cpp(902): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>main.cpp(908): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+     1>main.cpp(912): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>main.cpp(900): warning C4101: 'initarray' : unreferenced local variable
+     1>main.cpp(934): warning C4101: 'n' : unreferenced local variable
+     1>main.cpp(1051): warning C4305: '-=' : truncation from 'double' to 'float'
+     1>main.cpp(1052): warning C4305: '-=' : truncation from 'double' to 'float'
+     1>main.cpp(1056): warning C4305: '*=' : truncation from 'double' to 'float'
+     1>main.cpp(1101): warning C4305: '+=' : truncation from 'double' to 'float'
+     1>main.cpp(1102): warning C4305: '+=' : truncation from 'double' to 'float'
+     1>main.cpp(1106): warning C4305: '*=' : truncation from 'double' to 'float'
+     1>main.cpp(1140): warning C4305: '=' : truncation from 'double' to 'float'
+     1>main.cpp(1143): warning C4305: '=' : truncation from 'double' to 'float'
+     1>main.cpp(1146): warning C4305: '=' : truncation from 'double' to 'float'
+     1>main.cpp(1149): warning C4305: '=' : truncation from 'double' to 'float'
+     1>main.cpp(1317): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\stdio.h(357) : see declaration of 'sprintf'
+     1>main.cpp(1320): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\stdio.h(357) : see declaration of 'sprintf'
+     1>main.cpp(1344): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\stdio.h(311) : see declaration of 'sscanf'
+     1>main.cpp(1348): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\stdio.h(218) : see declaration of 'fopen'
+     1>main.cpp(1361): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\stdio.h(311) : see declaration of 'sscanf'
+     1>main.cpp(1362): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>main.cpp(1363): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>main.cpp(1378): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\stdio.h(311) : see declaration of 'sscanf'
+     1>main.cpp(1394): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\stdio.h(311) : see declaration of 'sscanf'
+     1>main.cpp(1397): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>main.cpp(1398): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>main.cpp(1399): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>main.cpp(1409): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+     1>main.cpp(1421): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\stdio.h(218) : see declaration of 'fopen'
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\cmp3cantrj\Desktop\OpenGL glsltexdemo-mod32\Debug\OpenGL Framework.exe" /INCREMENTAL /NOLOGO OpenGL32.lib glu32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\cmp3cantrj\Desktop\OpenGL glsltexdemo-mod32\Debug\OpenGL Framework.pdb" /ASSEMBLYDEBUG /TLBID:1 /DYNAMICBASE:NO /FIXED:NO /MACHINE:X86 /SAFESEH Debug\main.obj
+         Debug\Trans.obj
+         OpenGL Framework.vcxproj -> C:\Users\cmp3cantrj\Desktop\OpenGL glsltexdemo-mod32\Debug\OpenGL Framework.exe
+       BscMake:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\bscmake.exe /nologo /o"C:\Users\cmp3cantrj\Desktop\OpenGL glsltexdemo-mod32\Debug\OpenGL Framework.bsc" Debug\main.sbr Debug\Trans.sbr
+     1>Done Building Project "C:\Users\cmp3cantrj\Desktop\OpenGL glsltexdemo-mod32\OpenGL Framework.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:04.11

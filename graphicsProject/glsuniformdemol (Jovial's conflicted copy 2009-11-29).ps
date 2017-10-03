@@ -1,0 +1,31 @@
+#version 150
+//uniform float shade;//not used at presnt
+in vec3 cshade;
+in vec3 v_o;
+in vec3 locallight_o;
+in vec3 n;
+
+out vec4 pixelcolour;
+void main( )
+{
+	float shadescale;
+	vec3 vn,l,ln,nn,h,hh;
+	
+   vn=normalize(v_o);
+  	ln=normalize(locallight_o);
+	h=vn-ln;//light direction shines from source to object
+	hh=h;
+    h=normalize(h);
+    nn=normalize(n);
+    shadescale= dot(h,nn);//inward normal
+    if (shadescale<0)
+		shadescale=0;
+    shadescale*=shadescale;
+	shadescale*=shadescale;
+
+	// Get pixel colour from input shade
+		pixelcolour = vec4( cshade*shadescale, 1.0 );
+
+		
+	
+}
