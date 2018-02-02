@@ -1,20 +1,6 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-wallpaperm1024m1024.raw  1
-1024 1024
-paper2m_512m_512.raw 1
-512 512
-burloakm1024m1024.raw 1
-=======
-rock-colour.raw 1
-1024 1024
-cobbled-normal.raw 1
->>>>>>> f850ebd... normal mapping version 1
-=======
 uk-colour.raw 1
 1024 1024
 abstract-normal.raw 1
->>>>>>> 1d23a46... well turns out i just needed to cross product it...
 1024 1024
 end of texture
 4 0 1 // Number of Vertices, index of texture, index of normal map
@@ -37,21 +23,10 @@ end of texture
 0.3 0.3 0.3
 4 0 1
 0 0 200 0 0 
-<<<<<<< HEAD
-200 0 200   0 512 
-200 -200 200 512 512
-0 -200 200  512 0
-0.1 0 0
-=======
 200 0 200   0 1024 
 200 -200 200 1024 1024
 0 -200 200  1024 0
-<<<<<<< HEAD
-0.0 0.0 0.0
->>>>>>> 2490e45... set all colour to black, see what it does...
-=======
 0.3 0.3 0.3
->>>>>>> 1d23a46... well turns out i just needed to cross product it...
 4 0 1
 200 -200 0  0 0 
 200 -200 200 0 1024

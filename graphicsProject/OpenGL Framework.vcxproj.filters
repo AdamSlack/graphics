@@ -40,5 +40,19 @@
     <None Include="glsuniformdemol.ps">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="BOX.DAT">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="rocks-height.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="rocks-normal.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="rocks-colour.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
