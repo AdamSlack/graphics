@@ -9,6 +9,7 @@ in vec3 v_o;
 in vec3 pos;
 in vec3 locallight_o;
 in vec3 n;
+uniform int normalmapping;
 
 in vec2 tc_out;
 
@@ -41,7 +42,7 @@ void main( )
 
 	textureshade=texelFetch(mytexture,ivec2(tc_out),0).rgb;
 	normalshade= (2*texelFetch(mynormal,ivec2(tc_out),0).rgb) - 1;
-
+	
 	vn=normalize(cross(-v_o , normalshade));
 
   	ln=normalize(locallight_o);

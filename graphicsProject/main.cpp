@@ -272,6 +272,9 @@ GLhandleARB glGeomShader0;
 GLhandleARB glPixelShader0;
 GLhandleARB glPixelShader1;
 
+// normalmapping toggle
+int normalmapping = 1;
+
 
 //bool fourier = true;
 int iShader = 0;
@@ -782,7 +785,9 @@ bool bInitialiseGLSL( )
 		vec3centreindex=glGetUniformLocation( glContext0, "centre" );
 		vec3light_in_object_coordsindex=glGetUniformLocation( glContext0, "light_in_object_coords" );
 		vec3view_in_object_coordsindex=glGetUniformLocation( glContext0, "view_in_object_coords" );
-		
+
+		normalmapping = glGetUniformLocation(glContext0, "normalmapping");
+
 		pscaleindex=glGetUniformLocation( glContext0, "pscale" );
 					GLGETERROR( "PreGenBuffers" );
 
@@ -1131,9 +1136,11 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam 
 			break;
 		case VK_OEM_COMMA:
 			nearplane--;
+			normalmapping+=1; //= !normalmapping;
 			break;
 		case VK_OEM_PERIOD:
 			nearplane++;
+			normalmapping-=1;
 			break;
 		case VK_ADD:
 			fMoveZ+=1;

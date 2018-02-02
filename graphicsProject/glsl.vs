@@ -19,6 +19,7 @@ uniform mat3 rotation_projection;
 uniform vec3 objcentre_to_eye_projected;
 uniform vec3 light_in_object_coords;
 uniform vec3 view_in_object_coords;
+
 void main()
 {
 //do it all without homogenous co-ords
