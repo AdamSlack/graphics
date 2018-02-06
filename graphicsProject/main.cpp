@@ -665,7 +665,7 @@ bool bInitialiseGLSL( )
 
 	char *ShaderCode = "";// a Pointer to the text of the shader program
 
-	int vertexindex=97,colourindex=432,normalindex,tcoordindex;
+	int vertexindex=97,colourindex=432,normalindex,tcoordindex,tangentindex,bitangentindex;
 
 
 	// Enable shaders
@@ -788,7 +788,7 @@ bool bInitialiseGLSL( )
 		vec3view_in_object_coordsindex=glGetUniformLocation( glContext0, "view_in_object_coords" );
 
 		normalmapping = glGetUniformLocation(glContext0, "normalmapping");
-
+	
 		pscaleindex=glGetUniformLocation( glContext0, "pscale" );
 					GLGETERROR( "PreGenBuffers" );
 
@@ -804,6 +804,10 @@ bool bInitialiseGLSL( )
 		colourindex=glGetAttribLocation( glContext0,"vshade");
 		normalindex=glGetAttribLocation( glContext0,"normal");
 		tcoordindex=glGetAttribLocation( glContext0,"tcoord");
+		tangentindex = glGetAttribLocation(glContext0, "tangent");
+		bitangentindex = glGetAttribLocation(glContext0, "bitangent");
+
+
 			GLGETERROR( "glGetAttribLocation-c" );
 		vertexindex=glGetAttribLocation( glContext0,"pos");
 			GLGETERROR( "glGetAttribLocation-v" );
@@ -823,10 +827,16 @@ bool bInitialiseGLSL( )
 		glBindBuffer(GL_ARRAY_BUFFER,normalbuffer);//bind as an array buffer
 			GLGETERROR( "bufferdata3" );
 		glVertexAttribPointer(normalindex, 3, GL_FLOAT, GL_FALSE, 0, 0); 
-			GLGETERROR( "bufferdata4" );
+			GLGETERROR( "bufferdata7" );
+		glVertexAttribPointer(tangentindex, 4, GL_FLOAT, GL_FALSE, 0, 0);
+			GLGETERROR("bufferdata8");
+		glVertexAttribPointer(bitangentindex, 5, GL_FLOAT, GL_FALSE, 0, 0);
+			GLGETERROR("bufferdata4");
 		glBufferData(GL_ARRAY_BUFFER,3*polyarraysizes*sizeof(GLfloat),polyarrays[2],GL_STATIC_DRAW);
 			GLGETERROR( "bufferdata5" );
 		glEnableVertexAttribArray(normalindex);
+		glEnableVertexAttribArray(tangentindex);
+		glEnableVertexAttribArray(bitangentindex);
 			GLGETERROR( "bufferdata6" );
 		glGenBuffers(1,&tcoordbuffer);//allocate name
 			GLGETERROR( "GenBuffers" );
@@ -1268,7 +1278,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 		return 1; 
 	}
 	ReadFile("box.dat");
-	polyarrays=new float*[3];
+	polyarrays=new float*[5];
 	polyarraysizes=set_vertex_arrays(polyarrays,m_iNumOfPolys,polylist);
 	if (!bInitialiseGL( ))	
 	{
@@ -1358,16 +1368,25 @@ void calcBTMat(POLYGON & P) {
 	float s2 = uvThree.x - uvOne.x;
 	float t2 = uvThree.y - uvOne.y;
 
-	// Calculating Tangent and BiTangent.
-	P.tangent = Cross(
-		VectorDiff(uvOne, uvTwo),
-		P.normal
-	);
+	float det = 1 / ((s1*t2) - (s2*t1));
 
-	P.bitangent = Cross(
-		P.tangent,
-		P.normal
-	);
+	P.tangent.x = det * ((t2*Q1.x) + (-t1*Q2.x));
+	P.tangent.y = det * ((t2*Q1.y) + (-t1*Q2.y));
+	P.tangent.z = det * ((t2*Q1.z) + (-t1*Q2.z));
+	
+	P.bitangent.x = det * ((-s2*Q1.x) + (s1*Q2.x));
+	P.bitangent.y = det * ((-s2*Q1.y) + (s1*Q2.y));
+	P.bitangent.z = det * ((-s2*Q1.z) + (s1*Q2.z));
+
+	float tLength = (float)sqrt(Dot(P.tangent, P.tangent));
+	P.tangent.x /= tLength;
+	P.tangent.y /= tLength;
+	P.tangent.z /= tLength;
+
+	float bLength = (float)sqrt(Dot(P.bitangent, P.bitangent));
+	P.bitangent.x /= tLength;
+	P.bitangent.y /= tLength;
+	P.bitangent.z /= tLength;
 }
 
 //-----------------------------------------------------------------------------
@@ -1497,6 +1516,9 @@ int set_vertex_arrays(float **arrays,int n_polys, POLYGON *plist)
 	arrays[1]=new float[vcount];//shades
 	arrays[2]=new float[vcount];//vectors
 	arrays[3]=new float[tcount];//tcoords
+	arrays[4] = new float[vcount];
+	arrays[5] = new float[vcount];
+
 	
 	vcount=0;
 	tcount=0;
@@ -1508,18 +1530,25 @@ int set_vertex_arrays(float **arrays,int n_polys, POLYGON *plist)
 		{
 				arrays[0][vcount]=plist[pind].vert[0].x;
 				arrays[1][vcount]=plist[pind].colour.r;
+				arrays[4][vcount] = plist[pind].tangent.x;
+				arrays[5][vcount] = plist[pind].bitangent.x;
 				arrays[2][vcount++]=plist[pind].normal.x;
 
 				arrays[0][vcount]=plist[pind].vert[0].y;
 				arrays[1][vcount]=plist[pind].colour.g;
+				arrays[4][vcount] = plist[pind].tangent.y;
+				arrays[5][vcount] = plist[pind].bitangent.y;
 				arrays[2][vcount++]=plist[pind].normal.y;
 
 				arrays[0][vcount]=plist[pind].vert[0].z;
 				arrays[1][vcount]=plist[pind].colour.b;
+				arrays[4][vcount] = plist[pind].tangent.z;
+				arrays[5][vcount] = plist[pind].bitangent.z;
 				arrays[2][vcount++]=plist[pind].normal.z;
 
 				arrays[3][tcount++]=plist[pind].texPos[0].u;
 				arrays[3][tcount++]=plist[pind].texPos[0].v;
+
 				elecount++;
 			for (int j=i;j<i+2;j++)
 			{

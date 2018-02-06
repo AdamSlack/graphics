@@ -3,10 +3,12 @@ in vec3 pos;
 in vec3 vshade;
 in vec3 normal;
 
-out vec3 tangent;
-out vec3 bitangent;
+in vec3 tangent;
+in vec3 bitangent;
 
 in vec2 tcoord;
+
+
 out vec3 cshade;
 out vec3 v_o;
 out vec3 locallight_o;
@@ -19,6 +21,10 @@ uniform mat3 rotation_projection;
 uniform vec3 objcentre_to_eye_projected;
 uniform vec3 light_in_object_coords;
 uniform vec3 view_in_object_coords;
+
+out vec3 vecTangent;
+out vec3 vecBitangent;
+out mat3 TBN;
 
 void main()
 {
@@ -42,7 +48,8 @@ void main()
     cshade=vshade;
     tc_out=tcoord;
 
-	tangent = cross(vec3(0,0,0), normal);
-	bitangent = cross(bitangent, normal);
+	vecTangent = tangent;
+	vecBitangent = bitangent;
 
+	TBN = transpose(mat3(tangent, bitangent, normal));
 }
