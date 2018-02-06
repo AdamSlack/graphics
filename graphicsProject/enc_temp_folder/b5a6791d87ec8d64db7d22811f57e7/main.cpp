@@ -1365,7 +1365,7 @@ void calcBTMat(POLYGON & P) {
 	uvThree.y = P.texPos[2].v;
 
 	VECTOR Q1 = VectorDiff(P.vert[1], P.vert[0]);
-	VECTOR Q2 = VectorDiff(P.vert[2], P.vert[0]);
+	VECTOR Q2 = VectorDiff(P.vert[1], P.vert[0]);
 
 	float s1 = uvTwo.x - uvOne.x;
 	float t1 = uvTwo.y - uvOne.y;
@@ -1382,13 +1382,12 @@ void calcBTMat(POLYGON & P) {
 	P.bitangent.y = det * ((-s2*Q1.y) + (s1*Q2.y));
 	P.bitangent.z = det * ((-s2*Q1.z) + (s1*Q2.z));
 
-	// issue here.
-	float tLength = (float) sqrt(Dot(P.tangent, P.tangent));
+	float tLength = (float)sqrt(Dot(P.tangent, P.tangent));
 	P.tangent.x /= tLength;
 	P.tangent.y /= tLength;
 	P.tangent.z /= tLength;
 
-	float bLength = (float) sqrt(Dot(P.bitangent, P.bitangent));
+	float bLength = (float)sqrt(Dot(P.bitangent, P.bitangent));
 	P.bitangent.x /= bLength;
 	P.bitangent.y /= bLength;
 	P.bitangent.z /= bLength;
