@@ -3,8 +3,8 @@ in vec3 pos;
 in vec3 vshade;
 in vec3 normal;
 
-in vec3 tangent;
-in vec3 bitangent;
+out vec3 tangent;
+out vec3 bitangent;
 
 in vec2 tcoord;
 out vec3 cshade;
@@ -36,11 +36,13 @@ void main()
 
     gl_Position.xyz=transpos;
 
-    v_o=view_in_object_coords+pos;
-
+    v_o=view_in_object_coords + pos;
     n=normal;
 
     cshade=vshade;
-
     tc_out=tcoord;
+
+	tangent = cross(vec3(0,0,0), normal);
+	bitangent = cross(bitangent, normal);
+
 }

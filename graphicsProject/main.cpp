@@ -314,8 +314,9 @@ typedef struct polygon
 
 	// Extra information for back face removal, part B
 	VECTOR normal;    //Surface Normal Vector
-	VECTOR tangent;
-	VECTOR bitangent;
+
+	VECTOR tangent;		// tangent to surface normal
+	VECTOR bitangent;	// bitangent to surface normal
 
 	// Extra information for shading and texturing, part C
 	int vertVecNo[20];		// holds vertex vector number
@@ -1334,6 +1335,41 @@ void displayReadInfo( )
 }
 
 
+void calcBTMat(POLYGON & P) {
+	// Lengyel’s Method
+
+	VECTOR uvOne;
+	uvOne.x = P.texPos[0].u;
+	uvOne.y = P.texPos[0].v;
+
+	VECTOR uvTwo;
+	uvTwo.x = P.texPos[1].u;
+	uvTwo.y = P.texPos[1].v;
+
+	VECTOR uvThree;
+	uvThree.x = P.texPos[2].u;
+	uvThree.y = P.texPos[2].v;
+
+	VECTOR Q1 = VectorDiff(P.vert[1], P.vert[0]);
+	VECTOR Q2 = VectorDiff(P.vert[1], P.vert[0]);
+
+	float s1 = uvTwo.x - uvOne.x;
+	float t1 = uvTwo.y - uvOne.y;
+	float s2 = uvThree.x - uvOne.x;
+	float t2 = uvThree.y - uvOne.y;
+
+	// Calculating Tangent and BiTangent.
+	P.tangent = Cross(
+		VectorDiff(uvOne, uvTwo),
+		P.normal
+	);
+
+	P.bitangent = Cross(
+		P.tangent,
+		P.normal
+	);
+}
+
 //-----------------------------------------------------------------------------
 // Name: LoadPolys
 // Desc: Read polygon info from file
@@ -1395,17 +1431,16 @@ int LoadPolys( FILE *infile )
 			vertcount++;
 		}
 	
-		polylist[iNumPolys].normal = Cross( VectorDiff( polylist[iNumPolys].vert[0], polylist[iNumPolys].vert[1] ),
-									 VectorDiff( polylist[iNumPolys].vert[0],polylist[iNumPolys].vert[2] ) );
+		polylist[iNumPolys].normal = Cross(
+			VectorDiff( polylist[iNumPolys].vert[0], polylist[iNumPolys].vert[1]),
+			VectorDiff( polylist[iNumPolys].vert[0],polylist[iNumPolys].vert[2])
+		);
+
 		fLength = (float)sqrt( Dot( polylist[iNumPolys].normal, polylist[iNumPolys].normal ) ); // Calculate length of vector
 
 	    polylist[iNumPolys].normal.x /= fLength;	// Normalise
 	    polylist[iNumPolys].normal.y /= fLength;	// each
 	    polylist[iNumPolys].normal.z /= fLength;	// component
-
-		polylist[iNumPolys].tangent;
-		polylist[iNumPolys].bitangent;
-
 
 
 	    fgets(cInString, 1000, infile);		// Read  next line of file
@@ -1422,6 +1457,9 @@ int LoadPolys( FILE *infile )
 			polylist[iNumPolys].colour.g = fG;
 			polylist[iNumPolys].colour.b = fB;	
 		}
+
+		calcBTMat(polylist[iNumPolys]);
+
 		iNumPolys++;
 	} while( 1 );
 	centre=VScale(1.0/vertcount,centre);
@@ -1471,12 +1509,15 @@ int set_vertex_arrays(float **arrays,int n_polys, POLYGON *plist)
 				arrays[0][vcount]=plist[pind].vert[0].x;
 				arrays[1][vcount]=plist[pind].colour.r;
 				arrays[2][vcount++]=plist[pind].normal.x;
+
 				arrays[0][vcount]=plist[pind].vert[0].y;
 				arrays[1][vcount]=plist[pind].colour.g;
 				arrays[2][vcount++]=plist[pind].normal.y;
+
 				arrays[0][vcount]=plist[pind].vert[0].z;
 				arrays[1][vcount]=plist[pind].colour.b;
 				arrays[2][vcount++]=plist[pind].normal.z;
+
 				arrays[3][tcount++]=plist[pind].texPos[0].u;
 				arrays[3][tcount++]=plist[pind].texPos[0].v;
 				elecount++;
@@ -1485,12 +1526,15 @@ int set_vertex_arrays(float **arrays,int n_polys, POLYGON *plist)
 				arrays[0][vcount]=plist[pind].vert[j].x;
 				arrays[1][vcount]=plist[pind].colour.r;
 				arrays[2][vcount++]=plist[pind].normal.x;
+
 				arrays[0][vcount]=plist[pind].vert[j].y;
 				arrays[1][vcount]=plist[pind].colour.g;
 				arrays[2][vcount++]=plist[pind].normal.y;
+
 				arrays[0][vcount]=plist[pind].vert[j].z;
 				arrays[1][vcount]=plist[pind].colour.b;
 				arrays[2][vcount++]=plist[pind].normal.z;
+
 				arrays[3][tcount++]=plist[pind].texPos[j].u;
 				arrays[3][tcount++]=plist[pind].texPos[j].v;
 				elecount++;

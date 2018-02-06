@@ -42,6 +42,8 @@ void main( )
 
 	textureshade=texelFetch(mytexture,ivec2(tc_out),0).rgb;
 	normalshade= (2*texelFetch(mynormal,ivec2(tc_out),0).rgb) - 1;
+
+	vec3 tempShade = vec3(0.5f, 0.5f, 0.5f);
 	
 	vn=normalize(cross(-v_o , normalshade));
 
