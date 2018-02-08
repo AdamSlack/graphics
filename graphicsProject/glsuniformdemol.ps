@@ -37,12 +37,12 @@ void main( )
 	float fracLOD= fLOD-iLOD;
 	
 
-//textureshade = (bilinear(iLOD,tc_out)*(1.0-fracLOD)+bilinear(iLOD+1,tc_out)*fracLOD).rgb;
+//	textureshade = (bilinear(iLOD,tc_out)*(1.0-fracLOD)+bilinear(iLOD+1,tc_out)*fracLOD).rgb;
 //	textureshade = bilinear(iLOD,tc_out).rgb;
 //	textureshade=texelFetch(mytexture,ivec2(tc_out)>>iLOD,iLOD).rgb;
 
-	textureshade=texelFetch(mytexture,ivec2(tc_out),0).rgb;
-	normalshade= (2*texelFetch(mynormal,ivec2(tc_out),0).rgb) - 1;
+	textureshade = texelFetch(mytexture,ivec2(tc_out),0).rgb;
+	normalshade  = ( texelFetch(mynormal,ivec2(tc_out),0).rgb * 2 ) - 1;
 
 	vec3 tempShade = vec3(0.5f, 0.5f, 0.5f);
 	
