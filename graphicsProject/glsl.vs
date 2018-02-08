@@ -2,11 +2,9 @@
 in vec3 pos;
 in vec3 vshade;
 in vec3 normal;
-
+in vec2 tcoord;
 in vec3 tangent;
 in vec3 bitangent;
-
-in vec2 tcoord;
 
 
 out vec3 cshade;
@@ -51,5 +49,9 @@ void main()
 	vecTangent = tangent;
 	vecBitangent = bitangent;
 
-	TBN = transpose(mat3(tangent, bitangent, normal));
+	// check handedness of TBN
+	if (dot(cross(normal, tangent), bitangent) < 0.0f){
+		vecTangent = tangent * -1.0f;
+	}
+	TBN = transpose(mat3(vecTangent, bitangent, normal));
 }

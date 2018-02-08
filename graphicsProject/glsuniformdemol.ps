@@ -10,6 +10,7 @@ in vec3 pos;
 in vec3 locallight_o;
 in vec3 n;
 uniform int normalmapping;
+in mat3 TBN;
 
 in vec2 tc_out;
 
@@ -45,7 +46,7 @@ void main( )
 
 	vec3 tempShade = vec3(0.5f, 0.5f, 0.5f);
 	
-	vn=normalize(cross(-v_o , normalshade));
+	vn=normalize(normalshade * TBN);
 
   	ln=normalize(locallight_o);
 

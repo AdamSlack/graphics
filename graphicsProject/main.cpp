@@ -803,25 +803,29 @@ bool bInitialiseGLSL( )
 		glBindBuffer(GL_ARRAY_BUFFER,vertexbuffer);//bind as an array buffer
 		colourindex=glGetAttribLocation( glContext0,"vshade");
 		normalindex=glGetAttribLocation( glContext0,"normal");
-		tcoordindex=glGetAttribLocation( glContext0,"tcoord");
-		tangentindex = glGetAttribLocation(glContext0, "tangent");
-		bitangentindex = glGetAttribLocation(glContext0, "bitangent");
+		glBindAttribLocation(glContext0, 4, "tangent");
+		glBindAttribLocation(glContext0, 5, "bitangent");
+		tcoordindex = glGetAttribLocation(glContext0, "tcoord");
 
 			GLGETERROR( "glGetAttribLocation-c" );
 		vertexindex=glGetAttribLocation( glContext0,"pos");
 			GLGETERROR( "glGetAttribLocation-v" );
+
 		glVertexAttribPointer(vertexindex, 3, GL_FLOAT, GL_FALSE, 0, 0); 
 		glBufferData(GL_ARRAY_BUFFER,3*polyarraysizes*sizeof(GLfloat),polyarrays[0],GL_STATIC_DRAW);
 			GLGETERROR( "bufferdata1" );
 		glEnableVertexAttribArray(vertexindex);
+
 		glGenBuffers(1,&colourbuffer);//allocate name
 			GLGETERROR( "GenBuffers" );
 		glBindBuffer(GL_ARRAY_BUFFER,colourbuffer);//bind as an array buffer
+
 		glVertexAttribPointer(colourindex, 3, GL_FLOAT, GL_FALSE, 0, 0); 
 		glBufferData(GL_ARRAY_BUFFER,3*polyarraysizes*sizeof(GLfloat),polyarrays[1],GL_STATIC_DRAW);
 		glEnableVertexAttribArray(colourindex);
 			GLGETERROR( "bufferdata2" );
-				glGenBuffers(1,&normalbuffer);//allocate name
+
+		glGenBuffers(1,&normalbuffer);//allocate name
 			GLGETERROR( "GenBuffers" );
 		glBindBuffer(GL_ARRAY_BUFFER,normalbuffer);//bind as an array buffer
 			GLGETERROR( "bufferdata3" );
@@ -830,6 +834,7 @@ bool bInitialiseGLSL( )
 		glBufferData(GL_ARRAY_BUFFER,3*polyarraysizes*sizeof(GLfloat),polyarrays[2],GL_STATIC_DRAW);
 			GLGETERROR( "bufferdata5" );
 		glEnableVertexAttribArray(normalindex);
+
 			GLGETERROR( "bufferdata6" );
 		glGenBuffers(1,&tcoordbuffer);//allocate name
 			GLGETERROR( "GenBuffers" );
@@ -846,11 +851,22 @@ bool bInitialiseGLSL( )
 			GLGETERROR("GenBuffers");
 		glBindBuffer(GL_ARRAY_BUFFER, tangentbuffer);//bind as an array buffer
 			GLGETERROR("bufferdata3");
-		glVertexAttribPointer(tangentindex, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			GLGETERROR("bufferdata4");
 		glBufferData(GL_ARRAY_BUFFER, 3 * polyarraysizes * sizeof(GLfloat), polyarrays[4], GL_STATIC_DRAW);
 			GLGETERROR("bufferdata5");
-		glEnableVertexAttribArray(tangentindex);
+		glEnableVertexAttribArray(4);
+			GLGETERROR("bufferdata6");
+
+		glGenBuffers(1, &bitangentbuffer);//allocate name
+			GLGETERROR("GenBuffers");
+		glBindBuffer(GL_ARRAY_BUFFER, bitangentbuffer);//bind as an array buffer
+			GLGETERROR("bufferdata3");
+		glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			GLGETERROR("bufferdata4");
+		glBufferData(GL_ARRAY_BUFFER, 3 * polyarraysizes * sizeof(GLfloat), polyarrays[4], GL_STATIC_DRAW);
+			GLGETERROR("bufferdata5");
+		glEnableVertexAttribArray(5);
 			GLGETERROR("bufferdata6");
 
 		glBindBuffer(GL_ARRAY_BUFFER,colourbuffer);//rebind so we can change it later
@@ -1521,8 +1537,8 @@ int set_vertex_arrays(float **arrays,int n_polys, POLYGON *plist)
 	arrays[1]=new float[vcount];//shades
 	arrays[2]=new float[vcount];//vectors
 	arrays[3]=new float[tcount];//tcoords
-	arrays[4] = new float[vcount];
-	arrays[5] = new float[vcount];
+	arrays[4] = new float[vcount]; // tangents
+	arrays[5] = new float[vcount]; // bitangents
 
 	
 	vcount=0;
