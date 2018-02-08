@@ -1,0 +1,39 @@
+//--------------------------------------------------------------------------------------------
+// File:		sbm.ps
+// Version:		V0.1
+// Author:		Daniel Rhodes
+// Date:		27/11/2006
+// Description:	Super Bump Mapping 	Pixel Shader in	GLSL
+// Notes:		GLSL documentation can be found	at:
+//				http://developer.3dlabs.com/openGL2/index.htm
+// Varying:		gl_TexCoord[0]					= output vertex	tex	coords 0
+// Uniform:		
+// Output:		gl_FragColor					= output pixel color
+//--------------------------------------------------------------------------------------------
+
+#version 110
+#pragma optimize(on)	// Turn off some (but not all!!!) optimisations,
+						// makes more readable ASM
+#pragma debug(off)		// Adds extra debug info to output log (ilog_*.txt etc.),
+						// need NVemulate.exe to activate on NVIDIA cards
+			
+varying vec3 vReflectionVec;
+varying vec3 vEyeVec;
+varying vec3 vNormal;
+
+uniform samplerCube cubeMap;
+
+//-----------------------------------------------------------------------------
+// Name:	main
+// In:		None
+// Out:		None
+// Desc:	Main function
+//-----------------------------------------------------------------------------
+void main( )
+{
+	//vReflectionVec = reflect(vEyeVec, vNormal);
+
+	gl_FragColor = textureCubeLod(cubeMap, vReflectionVec,0.0);
+	//gl_FragColor = vec4(vReflectionVec,0.0);
+	//gl_FragColor = textureCube(cubeMap, gl_TexCoord[0].xyz);
+}

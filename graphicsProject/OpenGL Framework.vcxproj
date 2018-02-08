@@ -101,6 +101,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="BOX.DAT" />
+    <None Include="cubemap.ps" />
+    <None Include="cubemap.vs" />
     <None Include="geomdemo.gs" />
     <None Include="glsl.vs" />
     <None Include="glsuniformdemol.ps" />

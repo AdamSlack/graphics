@@ -1,2 +1,50 @@
-﻿  OpenGL Framework.vcxproj -> C:\Users\n0499528\github\graphics\graphicsProject\Debug\OpenGL Framework.exe
+﻿  main.cpp
+main.cpp(226): warning C4305: 'initializing': truncation from 'double' to 'float'
+main.cpp(386): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(2260): note: see declaration of 'sscanf'
+main.cpp(424): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(1772): note: see declaration of 'sprintf'
+main.cpp(658): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(2260): note: see declaration of 'sscanf'
+main.cpp(668): warning C4101: 'tangentindex': unreferenced local variable
+main.cpp(668): warning C4101: 'bitangentindex': unreferenced local variable
+main.cpp(948): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+main.cpp(954): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+main.cpp(958): warning C4838: conversion from 'double' to 'float' requires a narrowing conversion
+main.cpp(958): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+main.cpp(946): warning C4101: 'initarray': unreferenced local variable
+main.cpp(980): warning C4101: 'n': unreferenced local variable
+main.cpp(1102): warning C4305: '-=': truncation from 'double' to 'float'
+main.cpp(1103): warning C4305: '-=': truncation from 'double' to 'float'
+main.cpp(1107): warning C4305: '*=': truncation from 'double' to 'float'
+main.cpp(1152): warning C4305: '+=': truncation from 'double' to 'float'
+main.cpp(1153): warning C4305: '+=': truncation from 'double' to 'float'
+main.cpp(1157): warning C4305: '*=': truncation from 'double' to 'float'
+main.cpp(1193): warning C4305: '=': truncation from 'double' to 'float'
+main.cpp(1196): warning C4305: '=': truncation from 'double' to 'float'
+main.cpp(1199): warning C4305: '=': truncation from 'double' to 'float'
+main.cpp(1202): warning C4305: '=': truncation from 'double' to 'float'
+main.cpp(1370): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(1772): note: see declaration of 'sprintf'
+main.cpp(1373): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(1772): note: see declaration of 'sprintf'
+main.cpp(1460): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+main.cpp(1461): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+main.cpp(1500): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+main.cpp(1501): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+main.cpp(1502): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+main.cpp(1515): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+main.cpp(1442): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(2260): note: see declaration of 'sscanf'
+main.cpp(1446): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(207): note: see declaration of 'fopen'
+main.cpp(1459): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(2260): note: see declaration of 'sscanf'
+main.cpp(1474): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(2260): note: see declaration of 'sscanf'
+main.cpp(1497): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(2260): note: see declaration of 'sscanf'
+main.cpp(1527): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(207): note: see declaration of 'fopen'
+  OpenGL Framework.vcxproj -> C:\Users\n0499528\github\graphics\graphicsProject\Debug\OpenGL Framework.exe
   OpenGL Framework.vcxproj -> C:\Users\n0499528\github\graphics\graphicsProject\Debug\OpenGL Framework.pdb (Full PDB)

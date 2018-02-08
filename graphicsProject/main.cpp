@@ -871,9 +871,14 @@ bool bInitialiseGLSL( )
 
 		glBindBuffer(GL_ARRAY_BUFFER,colourbuffer);//rebind so we can change it later
 			GLGETERROR( "bufferdata7" );
-			break;
 
 	
+		//
+		//	Link Cubemap shaders here.
+		//
+		
+		break;
+
 	}
 
 	//--------------------------------------------------------------
@@ -981,6 +986,11 @@ void RenderScene( )
 		s*=s;
 
 	}
+
+	//
+	// Render Skybox here.
+	//
+
 	//--------------------------------
 	glFlush (); 
 	    GLGETERROR( "RenderScene4" );

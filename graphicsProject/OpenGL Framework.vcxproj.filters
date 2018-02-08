@@ -43,6 +43,12 @@
     <None Include="BOX.DAT">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="cubemap.ps">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="cubemap.vs">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="rocks-height.bmp">
