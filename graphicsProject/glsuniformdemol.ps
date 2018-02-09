@@ -1,7 +1,10 @@
 #version 150
+#extension GL_NV_shadow_samplers_cube : enable
 //uniform float shade;//not used at present
 uniform sampler2D mytexture;
 uniform sampler2D mynormal;
+uniform samplerCube cubemap;
+
 //uniform vec3 ambient;//for later
 
 in vec3 cshade;
@@ -9,6 +12,7 @@ in vec3 v_o;
 in vec3 pos;
 in vec3 locallight_o;
 in vec3 n;
+
 uniform int normalmapping;
 in mat3 TBN;
 
@@ -68,7 +72,13 @@ void main( )
 	if (diffuseshadescale<0)diffuseshadescale=0;
 		
 	// Get pixel colour from input shade
-	pixelcolour = vec4( cshade*shadescale+ textureshade*diffuseshadescale, 1.0 );
+	//pixelcolour = vec4( cshade*shadescale+ textureshade*diffuseshadescale, 1.0 );
+	
+	   
+
+	vec3 vReflectionVec = reflect(v_o, vn);
+
+	pixelcolour = textureCube(cubemap, vReflectionVec);
 
 		
 	

@@ -20,9 +20,12 @@ uniform vec3 objcentre_to_eye_projected;
 uniform vec3 light_in_object_coords;
 uniform vec3 view_in_object_coords;
 
+
+
 out vec3 vecTangent;
 out vec3 vecBitangent;
 out mat3 TBN;
+
 
 void main()
 {
@@ -54,4 +57,5 @@ void main()
 		vecTangent = tangent * -1.0f;
 	}
 	TBN = transpose(mat3(vecTangent, bitangent, normal));
+
 }

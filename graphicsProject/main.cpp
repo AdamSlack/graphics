@@ -132,6 +132,7 @@
 #include <gl/wglext.h>
 #include <math.h>
 #include "trans.h"
+#include "bmp.h"
 
 // Custom header files
 // Insert your header files here
@@ -142,6 +143,7 @@ using std::ifstream;
 using std::ofstream;
 using std::endl;
 using std::string;
+
 
 // GL functions
 
@@ -251,6 +253,8 @@ UINT mytexture_index;
 UINT mynorm_index;
 UINT mytexturesize_index;
 UINT myvshade_index;
+UINT cubemap;
+
 int mat3rotation_projectionindex;
 int vec3objcentre_to_eye_projectedindex;
 int vec3centreindex;
@@ -271,6 +275,9 @@ GLhandleARB glVertexShader1;
 GLhandleARB glGeomShader0;
 GLhandleARB glPixelShader0;
 GLhandleARB glPixelShader1;
+
+BMP cubeMapTexture;
+
 
 // normalmapping toggle
 int normalmapping = 1;
@@ -302,7 +309,8 @@ typedef struct texCoord
 typedef struct texture_mip_map
 {
    unsigned char **texMap;
-   int sx,sy,depth,comp;
+   int sx, sy, depth, comp;
+   bool envMap;
 }TEXTURE_MIP_MAP;
 
 typedef struct polygon
@@ -635,7 +643,103 @@ bool bInitialiseGLTextures( )
 		//glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
 		//glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
 		//glGenerateMipmap(GL_TEXTURE_2D); routine seems to be missing from headers - probably not good anyway - replace with a better one from own library
+		//-----------------------------------------------
+		// Set up cube map
+		//-----------------------------------------------
+		// Generate the texture id
+		glGenTextures(1, &cubeMapTexture.ID);
 
+		// Bind the texture
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTexture.ID);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+		//if (!cubeMapTexture.LoadBitmap("media\\debug_negx.bmp"))
+		if (!cubeMapTexture.LoadBitmap("media\\negx.bmp"))
+		{
+			MessageBox(NULL, "Error loading Cube Map - negx.", "Error! (bInitialiseGLTextures)", MB_OK);
+			return false;
+		}
+
+		gluBuild2DMipmaps(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, GL_RGB, cubeMapTexture.imageWidth,
+			cubeMapTexture.imageHeight, GL_RGB, GL_UNSIGNED_BYTE,
+			cubeMapTexture.imageData);
+
+		cubeMapTexture.FreeImage();
+
+		//if (!cubeMapTexture.LoadBitmap("media\\debug_negy.bmp"))
+		if (!cubeMapTexture.LoadBitmap("media\\negy.bmp"))
+		{
+			MessageBox(NULL, "Error loading Cube Map - negy.", "Error! (bInitialiseGLTextures)", MB_OK);
+			return false;
+		}
+
+		gluBuild2DMipmaps(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, GL_RGB, cubeMapTexture.imageWidth,
+			cubeMapTexture.imageHeight, GL_RGB, GL_UNSIGNED_BYTE,
+			cubeMapTexture.imageData);
+
+		cubeMapTexture.FreeImage();
+
+		//if (!cubeMapTexture.LoadBitmap("media\\debug_negz.bmp"))
+		if (!cubeMapTexture.LoadBitmap("media\\negz.bmp"))
+		{
+			MessageBox(NULL, "Error loading Cube Map - negz.", "Error! (bInitialiseGLTextures)", MB_OK);
+			return false;
+		}
+
+		gluBuild2DMipmaps(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, GL_RGB, cubeMapTexture.imageWidth,
+			cubeMapTexture.imageHeight, GL_RGB, GL_UNSIGNED_BYTE,
+			cubeMapTexture.imageData);
+
+		cubeMapTexture.FreeImage();
+
+		//if (!cubeMapTexture.LoadBitmap("media\\debug_posx.bmp"))
+		if (!cubeMapTexture.LoadBitmap("media\\posx.bmp"))
+		{
+			MessageBox(NULL, "Error loading Cube Map - posx.", "Error! (bInitialiseGLTextures)", MB_OK);
+			return false;
+		}
+
+		gluBuild2DMipmaps(GL_TEXTURE_CUBE_MAP_POSITIVE_X, GL_RGB, cubeMapTexture.imageWidth,
+			cubeMapTexture.imageHeight, GL_RGB, GL_UNSIGNED_BYTE,
+			cubeMapTexture.imageData);
+
+		cubeMapTexture.FreeImage();
+
+		//if (!cubeMapTexture.LoadBitmap("media\\debug_posy.bmp"))
+		if (!cubeMapTexture.LoadBitmap("media\\posy.bmp"))
+		{
+			MessageBox(NULL, "Error loading Cube Map - posy.", "Error! (bInitialiseGLTextures)", MB_OK);
+			return false;
+		}
+
+		gluBuild2DMipmaps(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, GL_RGB, cubeMapTexture.imageWidth,
+			cubeMapTexture.imageHeight, GL_RGB, GL_UNSIGNED_BYTE,
+			cubeMapTexture.imageData);
+
+		cubeMapTexture.FreeImage();
+
+		//if (!cubeMapTexture.LoadBitmap("media\\debug_posz.bmp"))
+		if (!cubeMapTexture.LoadBitmap("media\\posz.bmp"))
+		{
+			MessageBox(NULL, "Error loading Cube Map - posz.", "Error! ( bInitialiseGLTextures )", MB_OK);
+			return false;
+		}
+
+		gluBuild2DMipmaps(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, GL_RGB, cubeMapTexture.imageWidth,
+			cubeMapTexture.imageHeight, GL_RGB, GL_UNSIGNED_BYTE,
+			cubeMapTexture.imageData);
+
+		cubeMapTexture.FreeImage();
+
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		//glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		//-----------------------------------------------
+		// END: Set up cube map
+		//-----------------------------------------------
 
 	}
 	return GLGETERROR("Texture set up");
@@ -780,6 +884,7 @@ bool bInitialiseGLSL( )
 		myshade_index=glGetUniformLocation( glContext0, "shade" );
 		mytexture_index=glGetUniformLocation( glContext0, "mytexture" );
 		mynorm_index = glGetUniformLocation(glContext0, "mynormal");
+		cubemap = glGetUniformLocation(glContext0, "cubemap");
 //		mytexturesize_index=glGetUniformLocation( glContext0, "TexMapSize" );
 		mat3rotation_projectionindex=glGetUniformLocation( glContext0, "rotation_projection" );
 		vec3objcentre_to_eye_projectedindex=glGetUniformLocation( glContext0, "objcentre_to_eye_projected" );
@@ -959,6 +1064,7 @@ void RenderScene( )
 		t.rotate=Product(viewangles,t.rotate);
 		t.shift=MOnV(viewangles,t.shift);
 		glUniformMatrix3fv(mat3rotation_projectionindex,1,GL_FALSE,&(t.rotate.cx.x));
+		
 		glUniform3fv(vec3objcentre_to_eye_projectedindex,1,&(t.shift.x));
 		glUniform3fv(vec3centreindex,1,&(centre.x));
 		glUniform3fv(vec3light_in_object_coordsindex,1,&(lightobj.x));
@@ -966,6 +1072,9 @@ void RenderScene( )
 
 		glUniform1f( pscaleindex, pscale);
 		glUniform1i( myvmin_index, vmin);
+
+		glUniform1i(cubemap, 0);
+
 	
 	//--------------------------------
 	    GLGETERROR( "RenderScene1" );
