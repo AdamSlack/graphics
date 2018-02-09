@@ -17,6 +17,8 @@ uniform int normalmapping;
 in mat3 TBN;
 
 in vec2 tc_out;
+in vec3 objtoeye;
+in mat3 rotProj;
 
 out vec4 pixelcolour;
 
@@ -71,14 +73,28 @@ void main( )
 	float diffuseshadescale=dot(-ln,nn);
 	if (diffuseshadescale<0)diffuseshadescale=0;
 		
+	
+	vec3 incident_eye = normalize(v_o);
+	vec3 normal = normalize(vn);
+
+	vec3 reflected = reflect(incident_eye, normal);
+
+	// convert from object space to world space
+	// reflected = normalize (vec3(inverse(rotProj) * reflected));
+
+	float ratio = 1.0 /1.3333;
+	vec3 refracted = refract(incident_eye, normal, ratio);
+	
+	//vec4 reflCol = texture(cubemap, reflected);
+	vec4 reflCol = texture(cubemap, refracted);
+
+	pixelcolour = reflCol;
+
+
 	// Get pixel colour from input shade
 	//pixelcolour = vec4( cshade*shadescale+ textureshade*diffuseshadescale, 1.0 );
 	
-	   
-
-	vec3 vReflectionVec = reflect(v_o, vn);
-
-	pixelcolour = textureCube(cubemap, vReflectionVec);
+	///pixelcolour = reflectColour;
 
 		
 	

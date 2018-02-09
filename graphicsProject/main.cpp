@@ -906,7 +906,7 @@ bool bInitialiseGLSL( )
 		glGenBuffers(1,&vertexbuffer);//allocate name
 			GLGETERROR( "GenBuffers" );
 		glBindBuffer(GL_ARRAY_BUFFER,vertexbuffer);//bind as an array buffer
-		colourindex=glGetAttribLocation( glContext0,"vshade");
+		glBindAttribLocation( glContext0,1, "vshade");
 		normalindex=glGetAttribLocation( glContext0,"normal");
 		glBindAttribLocation(glContext0, 4, "tangent");
 		glBindAttribLocation(glContext0, 5, "bitangent");
@@ -925,9 +925,10 @@ bool bInitialiseGLSL( )
 			GLGETERROR( "GenBuffers" );
 		glBindBuffer(GL_ARRAY_BUFFER,colourbuffer);//bind as an array buffer
 
-		glVertexAttribPointer(colourindex, 3, GL_FLOAT, GL_FALSE, 0, 0); 
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0); 
 		glBufferData(GL_ARRAY_BUFFER,3*polyarraysizes*sizeof(GLfloat),polyarrays[1],GL_STATIC_DRAW);
-		glEnableVertexAttribArray(colourindex);
+
+		glEnableVertexAttribArray(1);
 			GLGETERROR( "bufferdata2" );
 
 		glGenBuffers(1,&normalbuffer);//allocate name
@@ -1062,7 +1063,9 @@ void RenderScene( )
 		double cotang=1.0/tan(angleofview);
 		MATRIX viewangles={{cotang*aspect,0,0},{0,cotang,0},{0,0,-1.0}};
 		t.rotate=Product(viewangles,t.rotate);
+
 		t.shift=MOnV(viewangles,t.shift);
+
 		glUniformMatrix3fv(mat3rotation_projectionindex,1,GL_FALSE,&(t.rotate.cx.x));
 		
 		glUniform3fv(vec3objcentre_to_eye_projectedindex,1,&(t.shift.x));
@@ -1073,7 +1076,6 @@ void RenderScene( )
 		glUniform1f( pscaleindex, pscale);
 		glUniform1i( myvmin_index, vmin);
 
-		glUniform1i(cubemap, 0);
 
 	
 	//--------------------------------
@@ -1730,6 +1732,8 @@ void DrawPolygon(POLYGON *p)
     GLGETERROR( "Drawpoly" );
 	glUniform1i(mytexture_index,/*GL_TEXTURE0+*/p->texindex);
 	glUniform1i(mynorm_index, p->normindex);
+	glUniform1i(cubemap, 0);
+
 //	glUniform2fv(mytexturesize_index,1,(float *)(&(p->texsize)));
     GLGETERROR( "Drawpoly2" );
 
