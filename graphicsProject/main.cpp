@@ -732,7 +732,7 @@ bool bInitialiseGLTextures( )
 		cubeMapTexture.FreeImage();
 
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		//glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -1050,16 +1050,26 @@ void RenderScene( )
 	static float pscale = -2.0;
 	const float aspect=float(WINDOWHEIGHT)/float(WINDOWWIDTH);
 	float initarray[14];
+
 	VECTOR light={ldist*sin(vang),0, ldist* cos(vang)};//light centred on object
 	pscale =2.0*nearplane;
+
 	    GLGETERROR( "PreRenderScene" );
+
 		wglMakeCurrent(hDC, hRC);
+
 		glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
+
 		glUseProgram( glContext0 );
+
 		VECTOR disp={fMoveX,fMoveY,fMoveZ};
+
 		TRANSFORM t=BuildTrans(-yRotation*3.14159/180.0,-xRotation*3.14159/180.0,0,disp);
+
 		VECTOR lightobj=MOnV(InverseRotationOnly(t),VectorDiff(light,disp));
+
 		VECTOR viewobj=MOnV(InverseRotationOnly(t),disp);
+
 		double cotang=1.0/tan(angleofview);
 		MATRIX viewangles={{cotang*aspect,0,0},{0,cotang,0},{0,0,-1.0}};
 		t.rotate=Product(viewangles,t.rotate);
@@ -1166,8 +1176,6 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam 
 		wglMakeCurrent(hDC, hRC);
 //GLGETERROR("Pixelformat4");
 		
-
-
 
 		return 0;
 		break;
@@ -1431,11 +1439,6 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 		MessageBox( NULL,"OpenGL 3.2 RC was not created!","Textures failed", MB_OK);
 		return 1; 
 	}
-
-
-
-
-
 
 	// Messsage loop
 	while( !isFinished )

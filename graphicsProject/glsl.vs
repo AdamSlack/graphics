@@ -22,22 +22,16 @@ uniform vec3 objcentre_to_eye_projected;
 uniform vec3 light_in_object_coords;
 uniform vec3 view_in_object_coords;
 
-
-out mat3 rotProj;
 out vec3 vecTangent;
 out vec3 vecBitangent;
 out mat3 TBN;
-out vec3 objtoeye;
 
 
 void main()
 {
 //do it all without homogenous co-ords
 	vec3 transpos;
-	objtoeye = objcentre_to_eye_projected;
 	locallight_o=light_in_object_coords-pos;
-
-	rotProj = rotation_projection;
 
 	transpos.xyz=rotation_projection*pos.xyz+objcentre_to_eye_projected;
 
