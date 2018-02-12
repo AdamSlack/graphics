@@ -57,7 +57,7 @@ void main()
 
   	ln=normalize(locallight_o);
 
-	h=vn-ln;//light direction shines from source to object
+	h = vn - ln;//light direction shines from source to object
     
 	h=normalize(h); 
     
@@ -76,7 +76,11 @@ void main()
 	
 	vec3 incident_eye = normalize(v_o);
 
-	vec3 reflected = reflect(incident_eye, nn);
+	vec3 reflected = normalize(reflect(incident_eye, normalshade));
+
+	///
+	reflected = rotation_projection * (reflected);
+	////
 
 	mat4 proj;
 	proj[0] = vec4(rotation_projection[0].xyz, 0.0f);
@@ -86,7 +90,7 @@ void main()
 
 	// convert from object space to world space
 	//
-	reflected = normalize (vec3(inverse(proj) * vec4(reflected, 0.0)));
+	//reflected = normalize (vec3(inverse(proj) * vec4(reflected, 0.0)));
 
 	float ratio = 1.0 /1.3333;
 	vec3 refracted = refract(incident_eye, vn, ratio);

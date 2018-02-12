@@ -1,6 +1,6 @@
 uk-colour.raw 1
 1024 1024
-cobbled-normal.raw 1
+uk-normal.raw 1
 1024 1024
 end of texture
 4 0 1 // Number of Vertices, index of texture, index of normal map

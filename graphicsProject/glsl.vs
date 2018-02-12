@@ -29,32 +29,35 @@ out mat3 TBN;
 
 void main()
 {
-//do it all without homogenous co-ords
-	vec3 transpos;
-	locallight_o=light_in_object_coords-pos;
+	//do it all without homogenous co-ords
 
-	transpos.xyz=rotation_projection*pos.xyz+objcentre_to_eye_projected;
+	vec3 transpos;
+	locallight_o = light_in_object_coords - pos;
+
+	transpos.xyz = rotation_projection * pos.xyz + objcentre_to_eye_projected;
 
 	//rawpos=pos;
-    gl_Position.w= transpos.z;
+    gl_Position.w = transpos.z;
 
-	transpos.z-=pscale;
+	transpos.z -= pscale;
 
-    gl_Position.xyz=transpos;
+    gl_Position.xyz = transpos;
 
-    v_o=view_in_object_coords + pos;
-    n=normal;
+    v_o = view_in_object_coords + pos;
+    n = normal;
 
-    cshade=vshade;
-    tc_out=tcoord;
+    cshade = vshade;
+    tc_out = tcoord;
 
 	vecTangent = tangent;
 	vecBitangent = bitangent;
 
 	// check handedness of TBN
+	
 	if (dot(cross(normal, tangent), bitangent) < 0.0f){
 		vecTangent = tangent * -1.0f;
 	}
+	
 	TBN = transpose(mat3(vecTangent, bitangent, normal));
 
 }

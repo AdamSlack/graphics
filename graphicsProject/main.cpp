@@ -1062,7 +1062,7 @@ void RenderScene( )
 
 		glUseProgram( glContext0 );
 
-		VECTOR disp={fMoveX,fMoveY,fMoveZ};
+		VECTOR disp={ fMoveX, fMoveY, fMoveZ };
 
 		TRANSFORM t=BuildTrans(-yRotation*3.14159/180.0,-xRotation*3.14159/180.0,0,disp);
 
