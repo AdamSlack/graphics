@@ -76,13 +76,17 @@ void main()
 	
 	vec3 incident_eye = normalize(v_o);
 
-	vec3 reflected = reflectionAngle(incident_eye, nn);
+	vec3 reflected = reflect(incident_eye, nn);
 
+	mat4 proj;
+	proj[0] = vec4(rotation_projection[0].xyz, 0.0f);
+	proj[1] = vec4(rotation_projection[1].xyz, 0.0f);
+	proj[2] = vec4(rotation_projection[2].xyz, 0.0f);
+	proj[3] = vec4(objcentre_to_eye_projected, 0.0f);
 
 	// convert from object space to world space
-	reflected = normalize (
-					vec3(inverse(rotation_projection) * reflected)
-				);
+	//
+	reflected = normalize (vec3(inverse(proj) * vec4(reflected, 0.0)));
 
 	float ratio = 1.0 /1.3333;
 	vec3 refracted = refract(incident_eye, vn, ratio);
