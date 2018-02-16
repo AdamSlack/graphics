@@ -1086,12 +1086,12 @@ void RenderScene( )
 		glUniform1f( pscaleindex, pscale);
 		glUniform1i( myvmin_index, vmin);
 
-
 	
 	//--------------------------------
 	    GLGETERROR( "RenderScene1" );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );   
 	GLGETERROR( "RenderScene2" );
+
 
 	for (int i=0;i<m_iNumOfPolys;i++)
 	{
@@ -1517,26 +1517,26 @@ void calcBTMat(POLYGON & P) {
 	P.tangent.x = det * ((t2*Q1.x) + (-t1*Q2.x));
 	P.tangent.y = det * ((t2*Q1.y) + (-t1*Q2.y));
 	P.tangent.z = det * ((t2*Q1.z) + (-t1*Q2.z));
-	
+
 	P.bitangent.x = det * ((-s2*Q1.x) + (s1*Q2.x));
 	P.bitangent.y = det * ((-s2*Q1.y) + (s1*Q2.y));
 	P.bitangent.z = det * ((-s2*Q1.z) + (s1*Q2.z));
 
 	// issue here.
-	float tLength = (float) sqrt(Dot(P.tangent, P.tangent));
+	float tLength = (float)sqrt(Dot(P.tangent, P.tangent));
 	P.tangent.x /= tLength;
 	P.tangent.y /= tLength;
 	P.tangent.z /= tLength;
 
-	float bLength = (float) sqrt(Dot(P.bitangent, P.bitangent));
+	float bLength = (float)sqrt(Dot(P.bitangent, P.bitangent));
 	P.bitangent.x /= bLength;
 	P.bitangent.y /= bLength;
 	P.bitangent.z /= bLength;
 
-
+	//*
 	// using method from NOW...
 	VECTOR p = P.vert[0];
-	VECTOR q = P.vert[1];
+	VECTOR q = P.vert[3];
 	TEXCOORD tp = P.texPos[0];
 	TEXCOORD tq = P.texPos[3];
 
@@ -1558,10 +1558,12 @@ void calcBTMat(POLYGON & P) {
 	btngt.x = diff.x * yDiff;
 	btngt.y = diff.y * yDiff;
 	btngt.z = diff.z * yDiff;
-	
+
 	P.tangent = tngt;
 	P.bitangent = btngt;
 
+	P.normal = P.normal;
+	//*/
 }
 
 //-----------------------------------------------------------------------------

@@ -53,11 +53,14 @@ void main()
 	vecBitangent = normalize(bitangent);
 
 	// check handedness of TBN
-	
 	if (dot(cross(normal, vecTangent), vecBitangent) < 0.0f){
 		vecTangent = vecTangent * -1.0f;
 	}
-	
+
+	//orthogonalise
+	//vecTangent = normalize(vecTangent-normal * dot(vecTangent,normal));
+	//vecBitangent = normalize(vecBitangent-normal * dot(vecBitangent,normal));
+
 	TBN = transpose(mat3(vecTangent, vecBitangent, normal));
 
 }

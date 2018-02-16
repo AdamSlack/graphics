@@ -24,4 +24,5 @@ void main()
 	vEyeVec = normalize((gl_ModelViewMatrix * gl_Vertex).xyz);
 	vNormal = normalize(gl_NormalMatrix * gl_Normal);
 	vReflectionVec = reflect(vEyeVec, vNormal);
+	
 }

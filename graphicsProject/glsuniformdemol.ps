@@ -38,7 +38,7 @@ void main()
 	float shadescale;
 	vec3 vn,l,ln,nn,h;
 	vec3 textureshade;
-	vec3 normalshade, nmn;
+	vec3 normalshade;
 
 	vec2 dtx = dFdx( tc_out );
 	vec2 dty = dFdy( tc_out );
@@ -52,21 +52,18 @@ void main()
 //	textureshade=texelFetch(mytexture,ivec2(tc_out)>>iLOD,iLOD).rgb;
 
 	textureshade = texelFetch(mytexture,ivec2(tc_out),0).rgb;
-	normalshade  = ( texelFetch(mynormal,ivec2(tc_out),0).rgb * 2 ) - 1;
-	
-	vec3 t_vn;
-	t_vn.x = dot(vecTangent, v_o);
-	t_vn.y = dot(vecBitangent, v_o);
-	t_vn.z = dot(n, v_o);
+	normalshade  = ( normalize(texelFetch(mynormal,ivec2(tc_out),0).rgb) * 2 ) - 1;
 
-	vn.x = dot(vecTangent, normalshade);
-	vn.y = dot(vecBitangent, normalshade);
-	vn.z = dot(n, normalshade);
-	vn = normalize(vn*t_vn);
-
-	vec3 reflected = normalize(reflect(v_o, vn));
+	vec3 tempShade = vec3(0.5f, 0.5f, 0.5f);
 	
-	reflected = normalize( inverse(rotation_projection) * (reflected - pos));
+	vec3 tn;
+	tn.x = dot(vecTangent, normalshade);
+	tn.y = dot(vecBitangent, normalshade);
+	tn.z = dot(n, normalshade);
+	tn = normalize(tn);//normalize(TBN * normalshade);
+
+	vec3 reflected = normalize(reflect(v_o, tn));
+	reflected = normalize( reflected );
 
 	float ratio = 1.0 /1.3333;
 	vec3 refracted = refract(v_o, vn, ratio);
@@ -74,27 +71,29 @@ void main()
 	vec4 reflCol = texture(cubemap, reflected);
 	vec4 refrCol = texture(cubemap, refracted);
 
-	//pixelcolour = reflCol; 
-	vec3 tempShade = vec3(0.5f, 0.5f, 0.5f);
+	pixelcolour = reflCol; 
 
-  	ln=normalize(locallight_o);
-	h = vn - ln;//light direction shines from source to object
-	h=normalize(h); 
-	nn=normalize(n);
-	shadescale= dot(h,nn);//inward normal
-    if (shadescale<0)
+	vn=normalize(TBN*v_o);
+  	ln=normalize(TBN*locallight_o);
+	//vn=normalize(v_o);
+  	//ln=normalize(locallight_o);
+	h=vn-ln;//light direction shines from source to object
+    h=normalize(h); 
+    nn=normalize(n);
+    shadescale= dot(h,tn);//inward normal
+
+    if (shadescale<0){
 		shadescale=0;
-
+	}
     shadescale*=shadescale;
 	shadescale*=shadescale;
 
-	float diffuseshadescale=dot(-ln,nn);
+	float diffuseshadescale=dot(-ln,tn);
 	if (diffuseshadescale<0)diffuseshadescale=0;
 	
 	// Get pixel colour from input shade
-	pixelcolour = vec4( cshade*shadescale+ textureshade*diffuseshadescale, 1.0 );
+	//pixelcolour = vec4( cshade*shadescale+ textureshade*diffuseshadescale, 1.0 );
 	
-
 }
 
 vec3 reflectionAngle(vec3 i, vec3 n) {
