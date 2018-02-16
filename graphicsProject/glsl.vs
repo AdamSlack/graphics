@@ -49,15 +49,15 @@ void main()
     cshade = vshade;
     tc_out = tcoord;
 
-	vecTangent = tangent;
-	vecBitangent = bitangent;
+	vecTangent = normalize(tangent);
+	vecBitangent = normalize(bitangent);
 
 	// check handedness of TBN
 	
-	if (dot(cross(normal, tangent), bitangent) < 0.0f){
-		vecTangent = tangent * -1.0f;
+	if (dot(cross(normal, vecTangent), vecBitangent) < 0.0f){
+		vecTangent = vecTangent * -1.0f;
 	}
 	
-	TBN = transpose(mat3(vecTangent, bitangent, normal));
+	TBN = transpose(mat3(vecTangent, vecBitangent, normal));
 
 }

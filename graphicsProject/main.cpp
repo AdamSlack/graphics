@@ -1490,7 +1490,7 @@ void displayReadInfo( )
 
 
 void calcBTMat(POLYGON & P) {
-	// Lengyel’s Method
+	// Using Lengyel’s Method
 
 	VECTOR uvOne;
 	uvOne.x = P.texPos[0].u;
@@ -1532,6 +1532,36 @@ void calcBTMat(POLYGON & P) {
 	P.bitangent.x /= bLength;
 	P.bitangent.y /= bLength;
 	P.bitangent.z /= bLength;
+
+
+	// using method from NOW...
+	VECTOR p = P.vert[0];
+	VECTOR q = P.vert[1];
+	TEXCOORD tp = P.texPos[0];
+	TEXCOORD tq = P.texPos[3];
+
+	VECTOR diff = VectorDiff(q, p);
+	float xDiff = tq.u - tp.u;
+	VECTOR tngt;
+
+	tngt.x = diff.x * xDiff;
+	tngt.y = diff.y * xDiff;
+	tngt.z = diff.z * xDiff;
+
+	q = P.vert[1];
+	tq = P.texPos[1];
+
+	diff = VectorDiff(q, p);
+	float yDiff = tq.v - tp.v;
+	VECTOR btngt;
+
+	btngt.x = diff.x * yDiff;
+	btngt.y = diff.y * yDiff;
+	btngt.z = diff.z * yDiff;
+	
+	P.tangent = tngt;
+	P.bitangent = btngt;
+
 }
 
 //-----------------------------------------------------------------------------
