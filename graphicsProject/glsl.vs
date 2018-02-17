@@ -24,6 +24,8 @@ uniform vec3 view_in_object_coords;
 
 out vec3 vecTangent;
 out vec3 vecBitangent;
+
+in mat3 tbn;
 out mat3 TBN;
 
 
@@ -49,18 +51,19 @@ void main()
     cshade = vshade;
     tc_out = tcoord;
 
-	vecTangent = normalize(tangent);
-	vecBitangent = normalize(bitangent);
-
 	// check handedness of TBN
+
 	if (dot(cross(normal, vecTangent), vecBitangent) < 0.0f){
 		vecTangent = vecTangent * -1.0f;
 	}
 
 	//orthogonalise
-	//vecTangent = normalize(vecTangent-normal * dot(vecTangent,normal));
-	//vecBitangent = normalize(vecBitangent-normal * dot(vecBitangent,normal));
+	vecTangent = normalize(vecTangent-normal * dot(vecTangent,normal));
+	vecBitangent = normalize(vecBitangent-normal * dot(vecBitangent,normal));
+
+	vecTangent = normalize(rotation_projection * normalize(tangent));
+	vecBitangent =normalize( rotation_projection * normalize(bitangent));
 
 	TBN = transpose(mat3(vecTangent, vecBitangent, normal));
-
+	//TBN = tbn;
 }

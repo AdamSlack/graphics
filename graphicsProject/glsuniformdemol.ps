@@ -52,7 +52,7 @@ void main()
 //	textureshade=texelFetch(mytexture,ivec2(tc_out)>>iLOD,iLOD).rgb;
 
 	textureshade = texelFetch(mytexture,ivec2(tc_out),0).rgb;
-	normalshade  = ( normalize(texelFetch(mynormal,ivec2(tc_out),0).rgb) * 2 ) - 1;
+	normalshade  = (normalize(texelFetch(mynormal,ivec2(tc_out),0).rgb) * 2 ) - 1;
 
 	vec3 tempShade = vec3(0.5f, 0.5f, 0.5f);
 	
@@ -60,7 +60,14 @@ void main()
 	tn.x = dot(vecTangent, normalshade);
 	tn.y = dot(vecBitangent, normalshade);
 	tn.z = dot(n, normalshade);
-	tn = normalize(tn);//normalize(TBN * normalshade);
+
+	vec3 tn_v;
+	tn_v.x = dot(vecTangent, v_o);
+	tn_v.y = dot(vecBitangent, v_o);
+	tn_v.z = dot(n, v_o);
+
+	//tn = normalize(tn);
+	tn = normalize(TBN * normalshade);
 
 	vec3 reflected = normalize(reflect(v_o, tn));
 	reflected = normalize( reflected );
@@ -75,8 +82,10 @@ void main()
 
 	vn=normalize(TBN*v_o);
   	ln=normalize(TBN*locallight_o);
+
 	//vn=normalize(v_o);
   	//ln=normalize(locallight_o);
+
 	h=vn-ln;//light direction shines from source to object
     h=normalize(h); 
     nn=normalize(n);
@@ -88,11 +97,11 @@ void main()
     shadescale*=shadescale;
 	shadescale*=shadescale;
 
-	float diffuseshadescale=dot(-ln,tn);
+	float diffuseshadescale=dot(-ln,vn);
 	if (diffuseshadescale<0)diffuseshadescale=0;
 	
 	// Get pixel colour from input shade
-	//pixelcolour = vec4( cshade*shadescale+ textureshade*diffuseshadescale, 1.0 );
+	//pixelcolour = vec4( cshade*shadescale+ textureshade*shadescale, 1.0 );
 	
 }
 

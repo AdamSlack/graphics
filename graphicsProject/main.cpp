@@ -1533,7 +1533,7 @@ void calcBTMat(POLYGON & P) {
 	P.bitangent.y /= bLength;
 	P.bitangent.z /= bLength;
 
-	//*
+	/*
 	// using method from NOW...
 	VECTOR p = P.vert[0];
 	VECTOR q = P.vert[3];

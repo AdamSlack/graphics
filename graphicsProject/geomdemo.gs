@@ -23,6 +23,10 @@ uniform vec3 light_in_object_coords;
 uniform vec3 view_in_object_coords;
 uniform float shade;
 uniform int vmin;
+
+// Tangent,Bitangent, Normal basis vectors.
+out mat3 tbn;
+
 int ns=2;
 	int vcount=0;
 struct vertex
@@ -60,6 +64,45 @@ vec3 newvert(in vec3 v1,in vec3 v2,float p)
 {
 	vec3 vtmp=mix(v1,v2,p)-centre;//vector in  direction between v1 and v2 from centre
 	return normalize(vtmp)*radius+centre;
+}
+
+void calcTBN(vec3 normal, vec3 v1, vec3 v2, vec3 v3, vec2 uv1, vec2 uv2, vec2 uv3) {
+
+	VECTOR Q1 = v2 - v1;
+	VECTOR Q2 = v3 - v1;
+
+	float s1 = uv2.x - uv1.x;
+	float t1 = uv2.y - uv1.y;
+	float s2 = uv3.x - uv1.x;
+	float t2 = uv3.y - uv1.y;
+
+	float det = 1 / ((s1*t2) - (s2*t1));
+
+	vec3 tangent;
+	vec3 bitangent;
+
+	tangent.x = det * ((t2*Q1.x) + (-t1*Q2.x));
+	tangent.y = det * ((t2*Q1.y) + (-t1*Q2.y));
+	tangent.z = det * ((t2*Q1.z) + (-t1*Q2.z));
+
+	bitangent.x = det * ((-s2*Q1.x) + (s1*Q2.x));
+	bitangent.y = det * ((-s2*Q1.y) + (s1*Q2.y));
+	bitangent.z = det * ((-s2*Q1.z) + (s1*Q2.z));
+	
+	tangent = normalize(tangent);
+	bitangent = normalize(bitangent);
+	normal = normalize(normal);
+
+	// check handedness of TBN
+	if (dot(cross(normal, tangent), bitangent) < 0.0f){
+		tangent = tangent * -1.0f;
+	}
+
+	//orthogonalise
+	tangent = normalize(tangent-normal * dot(tangent,normal));
+	bitangent = normalize(bitangent-normal * dot(bitangent,normal));
+
+	return transpose(mat3(tangent,bitangent, normal));
 }
 
 
@@ -167,6 +210,7 @@ void main()
 		}
 		EndPrimitive();
 		vpos+=vinc;
+
 		
 	}
 
