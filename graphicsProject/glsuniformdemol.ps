@@ -16,6 +16,7 @@ in vec3 vecTangent;
 in vec3 vecBitangent;
 
 uniform int viewType;
+uniform float eta;
 
 uniform int normalmapping;
 in mat3 TBN;
@@ -30,7 +31,7 @@ out vec4 pixelcolour;
 float getLOD( vec2 dtx, vec2 dty );
 float frexp( float x, out float e );
 vec4 bilinear(int LOD,vec2 tcoords);
-vec3 reflectionAngle(vec3 i, vec3 n);
+vec3 manualReflect(vec3 i, vec3 n);
 
 uniform mat3 rotation_projection;
 uniform vec3 objcentre_to_eye_projected;
@@ -92,37 +93,72 @@ void main()
     shadescale*=shadescale;
 	shadescale*=shadescale;
 
-	float diffuseshadescale=dot(-ln,TBN*tn);
+	float diffuseshadescale=dot(transpose(TBN)*-ln,tn);
 	if (diffuseshadescale<0)diffuseshadescale=0;
 	
-	// Environment reflection and refraction...	
-	vec3 reflected = normalize(rotation_projection*reflect(v_o, TBN*tn));
-	//reflected = normalize(rotation_projection*reflect(v_o, nn ));
+
+	///
+	///	Reflection
+	///
+	vec3 reflected = normalize(rotation_projection*manualReflect(v_o,TBN*tn));// TBN*tn));
+	//reflected = normalize(reflect(rotation_projection*v_o, nn ));
 	//reflected = normalize( reflected );	
 
-	float ratio = 1.0 /1.3333;
-	vec3 refracted = rotation_projection*refract(v_o, TBN*tn, ratio);
+	///
+	///	Refraction
+	///
+	float ratio = 1.0 /eta;
+	vec3 refracted = normalize(rotation_projection*refract(v_o,TBN*tn,ratio));// TBN*tn, ratio));
 	
+
+	///
+	/// Fresnel Mixing.
+	///
+	float fresnelPower = 5.0;
+	float f = ((1.0-eta) * (1.0-eta)) / ((1.0+eta) * (1.0+eta));
+	float mixRatio = ( f + (1.0 - f) * pow((1.0 - dot(-v_o, TBN*tn)), fresnelPower));
+
+
 	vec4 envCol;
+	vec3 refrCol;
+	vec3 reflCol;
+	vec3 mixed;
 	
-	if(viewType == 0) {
-		envCol = texture(cubemap, reflected);
-		pixelcolour = vec4( envCol.rgb*shadescale+ textureshade*shadescale, 1.0 );
-	}
-	else if(viewType == 1) {		
-		envCol = texture(cubemap, refracted);
-		pixelcolour = vec4( envCol.rgb*shadescale+ textureshade*shadescale, 1.0 );
-	}
-	else {
-		pixelcolour = vec4( cshade*shadescale+ textureshade*shadescale, 1.0 );
+	switch(viewType){
+		case 0:
+			envCol = texture(cubemap, reflected);
+			pixelcolour = vec4( envCol.rgb*shadescale+ textureshade*shadescale, 1.0 );
+			break;
+		case 1:		
+			envCol = texture(cubemap, refracted);
+			pixelcolour = vec4( envCol.rgb*shadescale+ textureshade*shadescale, 1.0 );
+			break;
+		case 2:
+			refrCol = vec3(texture(cubemap, refracted));
+			reflCol = vec3(texture(cubemap, reflected));
+			mixed = mix(refrCol, reflCol, mixRatio);
+			pixelcolour = vec4( mixed*shadescale+ textureshade*shadescale, 1.0 );
+			break;
+		case 3:
+			refrCol = vec3(texture(cubemap, refracted));
+			reflCol = vec3(texture(cubemap, reflected));
+			mixed = mix(refrCol, reflCol, mixRatio);
+			pixelcolour = vec4(mixed, 1.0);
+			break;
+		case 4:
+			pixelcolour = texture(cubemap, reflected);
+			break;
+		case 5:
+			pixelcolour = texture(cubemap, refracted);
+			break;
+		default:
+			pixelcolour = vec4( envCol.rgb*shadescale+ textureshade*shadescale, 1.0 );
+			break;
 	}
 
-	//pixelcolour = envCol; 
-
-	// Get pixel colour from input shade
 }
 
-vec3 reflectionAngle(vec3 i, vec3 n) {
+vec3 manualReflect(vec3 i, vec3 n) {
 	return i - 2.0 * dot(n, i) * n;
 }
 

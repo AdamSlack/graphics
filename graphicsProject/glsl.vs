@@ -61,9 +61,9 @@ void main()
 	vecTangent = normalize(rotation_projection * normalize(tangent));
 	vecBitangent = normalize(rotation_projection * normalize(bitangent));
 
-	if (dot(cross(normal, vecTangent), vecBitangent) < 0.0f){
-		vecTangent = vecTangent * -1.0f;
-	}
+	//if (dot(cross(normal, vecTangent), vecBitangent) < 0.0f){
+	//	vecTangent = vecTangent * -1.0f;
+	//}
 	//vecTangent = normalize(normalize(tangent));
 	//vecBitangent =normalize(normalize(bitangent));
 

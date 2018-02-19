@@ -231,6 +231,7 @@ float yRotation = 0.0f;
 float zRotation = 0.0f;
 float fMoveX = 0.0;
 float fMoveY = 0.0;
+float eta = 0.61;
 #if FULLSCREENQUAD // only move back 5 for non fullscreen quads
 	float fMoveZ = 0.0;
 #else
@@ -254,6 +255,7 @@ UINT mynorm_index;
 UINT mytexturesize_index;
 UINT myvshade_index;
 UINT cubemap;
+UINT etaIndex;
 
 int mat3rotation_projectionindex;
 int vec3objcentre_to_eye_projectedindex;
@@ -897,6 +899,7 @@ bool bInitialiseGLSL( )
 		vec3light_in_object_coordsindex=glGetUniformLocation( glContext0, "light_in_object_coords" );
 		vec3view_in_object_coordsindex=glGetUniformLocation( glContext0, "view_in_object_coords" );
 		viewTypeIndex = glGetUniformLocation(glContext0, "viewType");
+		etaIndex = glGetUniformLocation(glContext0, "eta");
 
 		normalmapping = glGetUniformLocation(glContext0, "normalmapping");
 	
@@ -1307,6 +1310,12 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam 
 			break;
 		case VK_DOWN:
 			fMoveY--;
+			break;
+		case VK_J:
+			eta -= 0.1;
+			break;
+		case VK_K:
+			eta += 0.1;
 			break;
 		case VK_OEM_COMMA:
 			nearplane--;
@@ -1782,6 +1791,7 @@ void DrawPolygon(POLYGON *p)
 	glUniform1i(mytexture_index,/*GL_TEXTURE0+*/p->texindex);
 	glUniform1i(mynorm_index, p->normindex);
 	glUniform1i(cubemap, 0);
+	glUniform1f(etaIndex, eta);
 
 //	glUniform2fv(mytexturesize_index,1,(float *)(&(p->texsize)));
     GLGETERROR( "Drawpoly2" );
