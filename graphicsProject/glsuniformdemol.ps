@@ -64,14 +64,16 @@ void main()
 	tn.y = dot(vecBitangent, normalshade);
 	tn.z = dot(n, normalshade);
 
+	
 	//tn = normalize(tn);
 	//tn = normalize(TBN * normalshade);
 	tn = normalize(normalshade);
+	vec3 tn_o = TBN*tn;
 
 	vec3 tn_l;
 	tn_l.x = dot(vecTangent, locallight_o);
 	tn_l.y = dot(vecBitangent, locallight_o);
-	tn_l.z = dot(n, locallight_o);
+	tn_l.z = dot(rotation_projection*n, locallight_o);
 
 	vec3 tn_v;
 	tn_v.x = dot(vecTangent, v_o);
@@ -100,7 +102,7 @@ void main()
 	///
 	///	Reflection
 	///
-	vec3 reflected = normalize(rotation_projection*manualReflect(v_o,TBN*tn));// TBN*tn));
+	vec3 reflected = normalize(manualReflect(v_o, TBN*tn));// TBN*tn));
 	//reflected = normalize(reflect(rotation_projection*v_o, nn ));
 	//reflected = normalize( reflected );	
 
@@ -108,11 +110,13 @@ void main()
 	///	Refraction
 	///
 	float ratio = 1.0 /eta;
-	vec3 refracted = normalize(rotation_projection*refract(v_o,TBN*tn,ratio));// TBN*tn, ratio));
-	
+	vec3 refracted = normalize(refract(v_o, TBN*tn, ratio));// TBN*tn, ratio));
+	vec3 rRefr = rotation_projection*refract(v_o, TBN*tn, eta + 0.1);
+    vec3 gRefr = rotation_projection*refract(v_o, TBN*tn, eta);
+    vec3 bRefr = rotation_projection*refract(v_o, TBN*tn, eta - 0.1);
 
 	///
-	/// Fresnel Mixing.
+	/// Chromatic Abhoration.
 	///
 	float fresnelPower = 5.0;
 	float f = ((1.0-eta) * (1.0-eta)) / ((1.0+eta) * (1.0+eta));
@@ -125,32 +129,55 @@ void main()
 	vec3 mixed;
 	
 	switch(viewType){
+		//
+		//	Reflection With Texture
+		// 
 		case 0:
 			envCol = texture(cubemap, reflected);
 			pixelcolour = vec4( envCol.rgb*shadescale+ textureshade*shadescale, 1.0 );
 			break;
+		//
+		//	Refraction With Texture
+		//
 		case 1:		
 			envCol = texture(cubemap, refracted);
 			pixelcolour = vec4( envCol.rgb*shadescale+ textureshade*shadescale, 1.0 );
 			break;
+		//
+		//	Reflection Without Texture
+		//
 		case 2:
-			refrCol = vec3(texture(cubemap, refracted));
-			reflCol = vec3(texture(cubemap, reflected));
-			mixed = mix(refrCol, reflCol, mixRatio);
-			pixelcolour = vec4( mixed*shadescale+ textureshade*shadescale, 1.0 );
+			pixelcolour = texture(cubemap, reflected);
 			break;
+		//
+		//	Refraction Without Texture
+		//
 		case 3:
+			pixelcolour = texture(cubemap, refracted);
+			break;
+		//
+		//	Refracting on diffo colours..
+		//
+		case 4:
+			float rCol = texture(cubemap, rRefr).r;
+			float gCol = texture(cubemap, gRefr).g;
+			float bCol = texture(cubemap, bRefr).b;
+			
+			pixelcolour = vec4(rCol,gCol,bCol, 1.0);
+			break;
+		//
+		//	Chromatic Abhoration????	
+		//
+		case 5:
 			refrCol = vec3(texture(cubemap, refracted));
 			reflCol = vec3(texture(cubemap, reflected));
 			mixed = mix(refrCol, reflCol, mixRatio);
 			pixelcolour = vec4(mixed, 1.0);
 			break;
-		case 4:
-			pixelcolour = texture(cubemap, reflected);
-			break;
-		case 5:
-			pixelcolour = texture(cubemap, refracted);
-			break;
+		//
+		//
+		//	No Environment Mapping, just texture and normal map
+		//
 		default:
 			pixelcolour = vec4( envCol.rgb*shadescale+ textureshade*shadescale, 1.0 );
 			break;
