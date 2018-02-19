@@ -53,16 +53,20 @@ void main()
 
 	// check handedness of TBN
 
-	if (dot(cross(normal, vecTangent), vecBitangent) < 0.0f){
-		vecTangent = vecTangent * -1.0f;
-	}
+
 
 	//orthogonalise
 	vecTangent = normalize(vecTangent-normal * dot(vecTangent,normal));
 	vecBitangent = normalize(vecBitangent-normal * dot(vecBitangent,normal));
 
 	vecTangent = normalize(rotation_projection * normalize(tangent));
-	vecBitangent =normalize( rotation_projection * normalize(bitangent));
+
+	vecBitangent = normalize(rotation_projection * normalize(bitangent));
+	if (dot(cross(normal, vecTangent), vecBitangent) < 0.0f){
+		vecTangent = vecTangent * -1.0f;
+	}
+	//vecTangent = normalize(normalize(tangent));
+	//vecBitangent =normalize(normalize(bitangent));
 
 	TBN = transpose(mat3(vecTangent, vecBitangent, normal));
 	//TBN = tbn;

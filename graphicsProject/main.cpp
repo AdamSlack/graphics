@@ -378,7 +378,7 @@ void Shutdown( );
 void ReadFile(char *filename);
 int set_vertex_arrays(float **arrays,int n_polys, POLYGON *plist);
 void DrawPolygon(POLYGON *p);
-
+void calcBTMat(POLYGON & P);
 // My Functions
 //-----------------------------------------------------------------------------
 // Name:	mip_map_texture_file_read
@@ -1096,7 +1096,7 @@ void RenderScene( )
 	for (int i=0;i<m_iNumOfPolys;i++)
 	{
 		DrawPolygon(&polylist[i]);
-
+		calcBTMat(polylist[i]);
 		//test evaluation of vertex shader code for debugging
 		VECTOR v,h,l,n;
 		v=Normalise(viewobj);
