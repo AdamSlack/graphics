@@ -6,7 +6,6 @@ in vec2 tcoord;
 in vec3 tangent;
 in vec3 bitangent;
 
-
 out vec3 cshade;
 out vec3 v_o;
 out vec3 locallight_o;
@@ -27,6 +26,7 @@ out vec3 vecBitangent;
 
 in mat3 tbn;
 out mat3 TBN;
+out vec3 POS;
 
 
 void main()
@@ -45,6 +45,7 @@ void main()
 
     gl_Position.xyz = transpos;
 
+	POS = pos;
     v_o = view_in_object_coords + pos;
     n = normal;
 
@@ -53,15 +54,13 @@ void main()
 
 	// check handedness of TBN
 
-
-
 	//orthogonalise
 	vecTangent = normalize(vecTangent-normal * dot(vecTangent,normal));
 	vecBitangent = normalize(vecBitangent-normal * dot(vecBitangent,normal));
 
 	vecTangent = normalize(rotation_projection * normalize(tangent));
-
 	vecBitangent = normalize(rotation_projection * normalize(bitangent));
+
 	if (dot(cross(normal, vecTangent), vecBitangent) < 0.0f){
 		vecTangent = vecTangent * -1.0f;
 	}

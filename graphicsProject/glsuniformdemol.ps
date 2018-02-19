@@ -15,11 +15,13 @@ in vec3 n;
 in vec3 vecTangent;
 in vec3 vecBitangent;
 
+uniform int viewType;
 
 uniform int normalmapping;
 in mat3 TBN;
 
 in vec2 tc_out;
+in vec3 POS;
 
 out vec4 pixelcolour;
 
@@ -75,7 +77,6 @@ void main()
 	tn_v.y = dot(vecBitangent, v_o);
 	tn_v.z = dot(n, v_o);
 
-
 	vn=normalize(tn_v);
 	//vn=normalize(v_o);
   	//ln=normalize(locallight_o);
@@ -91,24 +92,34 @@ void main()
     shadescale*=shadescale;
 	shadescale*=shadescale;
 
-	float diffuseshadescale=dot(-ln,tn);
+	float diffuseshadescale=dot(-ln,TBN*tn);
 	if (diffuseshadescale<0)diffuseshadescale=0;
 	
 	// Environment reflection and refraction...	
-	vec3 reflected = normalize(rotation_projection*reflect(v_o, TBN*tn ));
+	vec3 reflected = normalize(rotation_projection*reflect(v_o, TBN*tn));
 	//reflected = normalize(rotation_projection*reflect(v_o, nn ));
-	//reflected = normalize( reflected );
+	//reflected = normalize( reflected );	
 
 	float ratio = 1.0 /1.3333;
-	vec3 refracted = rotation_projection*refract(v_o, nn, ratio);
+	vec3 refracted = rotation_projection*refract(v_o, TBN*tn, ratio);
 	
-	vec4 reflCol = texture(cubemap, reflected);
-	vec4 refrCol = texture(cubemap, refracted);
+	vec4 envCol;
 	
-	pixelcolour = reflCol; 
+	if(viewType == 0) {
+		envCol = texture(cubemap, reflected);
+		pixelcolour = vec4( envCol.rgb*shadescale+ textureshade*shadescale, 1.0 );
+	}
+	else if(viewType == 1) {		
+		envCol = texture(cubemap, refracted);
+		pixelcolour = vec4( envCol.rgb*shadescale+ textureshade*shadescale, 1.0 );
+	}
+	else {
+		pixelcolour = vec4( cshade*shadescale+ textureshade*shadescale, 1.0 );
+	}
+
+	//pixelcolour = envCol; 
 
 	// Get pixel colour from input shade
-	//pixelcolour = vec4( cshade*shadescale+ textureshade*shadescale, 1.0 );
 }
 
 vec3 reflectionAngle(vec3 i, vec3 n) {

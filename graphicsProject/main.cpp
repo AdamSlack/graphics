@@ -263,6 +263,10 @@ int vec3view_in_object_coordsindex;
 int pscaleindex;
 int myvmin_index;
 int vmin=0;
+
+int viewType = 0;
+UINT viewTypeIndex;
+
 // Map buffer addresses
 float *colourpointer;
 VECTOR centre;
@@ -885,12 +889,14 @@ bool bInitialiseGLSL( )
 		mytexture_index=glGetUniformLocation( glContext0, "mytexture" );
 		mynorm_index = glGetUniformLocation(glContext0, "mynormal");
 		cubemap = glGetUniformLocation(glContext0, "cubemap");
+
 //		mytexturesize_index=glGetUniformLocation( glContext0, "TexMapSize" );
 		mat3rotation_projectionindex=glGetUniformLocation( glContext0, "rotation_projection" );
 		vec3objcentre_to_eye_projectedindex=glGetUniformLocation( glContext0, "objcentre_to_eye_projected" );
 		vec3centreindex=glGetUniformLocation( glContext0, "centre" );
 		vec3light_in_object_coordsindex=glGetUniformLocation( glContext0, "light_in_object_coords" );
 		vec3view_in_object_coordsindex=glGetUniformLocation( glContext0, "view_in_object_coords" );
+		viewTypeIndex = glGetUniformLocation(glContext0, "viewType");
 
 		normalmapping = glGetUniformLocation(glContext0, "normalmapping");
 	
@@ -1086,6 +1092,8 @@ void RenderScene( )
 		glUniform1f( pscaleindex, pscale);
 		glUniform1i( myvmin_index, vmin);
 
+		glUniform1i(viewTypeIndex, viewType);
+
 	
 	//--------------------------------
 	    GLGETERROR( "RenderScene1" );
@@ -1275,6 +1283,12 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam 
 
 			filterwidth*=1.1;
 			break;
+		case VK_N:
+			viewType -= 1;
+			break;
+		case VK_M:
+			viewType += 1;
+			break;
 		case VK_F:
 			vmin--;
 			if (vmin<0) vmin=0;
@@ -1303,10 +1317,10 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam 
 			normalmapping-=1;
 			break;
 		case VK_ADD:
-			fMoveZ+=1;
+			fMoveZ+=10;
 			break;
 		case VK_SUBTRACT:
-			fMoveZ -=1;
+			fMoveZ -=10;
 			break;
 		case VK_1:
 			vang=3.14159/4;
