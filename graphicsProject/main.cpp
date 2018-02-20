@@ -267,7 +267,11 @@ int myvmin_index;
 int vmin=0;
 
 int viewType = 0;
+int scale = 40;
+int permuteCount = 2;
 UINT viewTypeIndex;
+UINT scaleIndex;
+UINT permuteCountIndex;
 
 // Map buffer addresses
 float *colourpointer;
@@ -899,6 +903,9 @@ bool bInitialiseGLSL( )
 		vec3light_in_object_coordsindex=glGetUniformLocation( glContext0, "light_in_object_coords" );
 		vec3view_in_object_coordsindex=glGetUniformLocation( glContext0, "view_in_object_coords" );
 		viewTypeIndex = glGetUniformLocation(glContext0, "viewType");
+		permuteCountIndex = glGetUniformLocation(glContext0, "permuteCount");
+		GLGETERROR("permuteCount ");
+		scaleIndex = glGetUniformLocation(glContext0, "scale");
 		etaIndex = glGetUniformLocation(glContext0, "eta");
 
 		normalmapping = glGetUniformLocation(glContext0, "normalmapping");
@@ -1096,6 +1103,10 @@ void RenderScene( )
 		glUniform1i( myvmin_index, vmin);
 
 		glUniform1i(viewTypeIndex, viewType);
+		glUniform1i(scaleIndex, scale);
+
+		glUniform1i(permuteCountIndex, permuteCount);
+		GLGETERROR("permuteCount");
 
 	
 	//--------------------------------
@@ -1346,7 +1357,21 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam 
 		case VK_0:
 				vang=0;
 				break;
-
+		case VK_8:
+			scale -= 1;
+			break;
+		case VK_9:
+			scale += 1;
+			break;
+		case VK_7:
+			permuteCount += 1;
+			break;
+		case VK_6:
+			permuteCount -= 1;
+			if (permuteCount < 2) {
+				permuteCount = 2;
+			}
+			break;
 		}
 		break;
 	case WM_LBUTTONDOWN:
