@@ -15,11 +15,14 @@ in vec3 n;
 in vec3 vecTangent;
 in vec3 vecBitangent;
 
+uniform int viewType;
+uniform float eta;
 
 uniform int normalmapping;
 in mat3 TBN;
 
 in vec2 tc_out;
+in vec3 POS;
 
 out vec4 pixelcolour;
 
@@ -28,7 +31,28 @@ out vec4 pixelcolour;
 float getLOD( vec2 dtx, vec2 dty );
 float frexp( float x, out float e );
 vec4 bilinear(int LOD,vec2 tcoords);
-vec3 reflectionAngle(vec3 i, vec3 n);
+vec3 manualReflect(vec3 i, vec3 n);
+
+
+//
+//
+
+vec2 fade(vec2 t);
+float cnoise(vec2 P);
+vec4 permute(vec4 x);
+
+vec3 permute_simplex(vec3 x);
+float snoise(vec2 v);
+
+float blurPerlin(vec2 tc);
+
+uniform int scale;
+uniform int permuteCount;
+
+//
+//
+
+
 
 uniform mat3 rotation_projection;
 uniform vec3 objcentre_to_eye_projected;
@@ -38,7 +62,7 @@ void main()
 	float shadescale;
 	vec3 vn,l,ln,nn,h;
 	vec3 textureshade;
-	vec3 normalshade, nmn;
+	vec3 normalshade;
 
 	vec2 dtx = dFdx( tc_out );
 	vec2 dty = dFdy( tc_out );
@@ -52,52 +76,341 @@ void main()
 //	textureshade=texelFetch(mytexture,ivec2(tc_out)>>iLOD,iLOD).rgb;
 
 	textureshade = texelFetch(mytexture,ivec2(tc_out),0).rgb;
-	normalshade  = ( texelFetch(mynormal,ivec2(tc_out),0).rgb * 2 ) - 1;
-	
-	vec3 t_vn;
-	t_vn.x = dot(vecTangent, v_o);
-	t_vn.y = dot(vecBitangent, v_o);
-	t_vn.z = dot(n, v_o);
+	normalshade  = (normalize(texelFetch(mynormal,ivec2(tc_out),0).rgb) * 2 ) - 1;
 
-	vn.x = dot(vecTangent, normalshade);
-	vn.y = dot(vecBitangent, normalshade);
-	vn.z = dot(n, normalshade);
-	vn = normalize(vn*t_vn);
-
-	vec3 reflected = normalize(reflect(v_o, vn));
-	
-	reflected = normalize( inverse(rotation_projection) * (reflected - pos));
-
-	float ratio = 1.0 /1.3333;
-	vec3 refracted = refract(v_o, vn, ratio);
-	
-	vec4 reflCol = texture(cubemap, reflected);
-	vec4 refrCol = texture(cubemap, refracted);
-
-	//pixelcolour = reflCol; 
 	vec3 tempShade = vec3(0.5f, 0.5f, 0.5f);
+	
+	vec3 tn;
+	tn.x = dot(vecTangent, normalshade);
+	tn.y = dot(vecBitangent, normalshade);
+	tn.z = dot(rotation_projection*n, normalshade);
 
+	
+	//tn = normalize(tn);
+	//tn = normalize(TBN * normalshade);
+	tn = normalize(normalshade);
+	vec3 tn_o = TBN*tn;
+
+	vec3 tn_l;
+	tn_l.x = dot(vecTangent, locallight_o);
+	tn_l.y = dot(vecBitangent, locallight_o);
+	tn_l.z = dot(rotation_projection*n, locallight_o);
+
+	vec3 tn_v;
+	tn_v.x = dot(vecTangent, v_o);
+	tn_v.y = dot(vecBitangent, v_o);
+	tn_v.z = dot(n, v_o);
+
+	//vn=normalize(tn_v);
+	//ln=normalize(tn_l);
+	vn=normalize(v_o);
   	ln=normalize(locallight_o);
-	h = vn - ln;//light direction shines from source to object
-	h=normalize(h); 
-	nn=normalize(n);
-	shadescale= dot(h,nn);//inward normal
-    if (shadescale<0)
-		shadescale=0;
 
+	h=vn-ln;//light direction shines from source to object
+    h=normalize(h); 
+    nn=normalize(n);
+    shadescale= dot(h,TBN*tn);//inward normal
+
+    if (shadescale<0){
+		shadescale=0;
+	}
     shadescale*=shadescale;
 	shadescale*=shadescale;
+	shadescale*=shadescale;
+	shadescale*=shadescale;
 
-	float diffuseshadescale=dot(-ln,nn);
+
+	float diffuseshadescale=dot(-ln,TBN*tn);
 	if (diffuseshadescale<0)diffuseshadescale=0;
-	
-	// Get pixel colour from input shade
-	pixelcolour = vec4( cshade*shadescale+ textureshade*diffuseshadescale, 1.0 );
-	
+	diffuseshadescale = clamp(diffuseshadescale+shadescale,0.0, 1.0);
+	//
+	//	Specular
+	//
+
+	///
+	///	Reflection
+	///
+	vec3 reflected = rotation_projection * manualReflect(v_o, TBN*tn);// TBN*tn));
+	//reflected = normalize(reflect(rotation_projection*v_o, nn ));
+	//reflected = normalize( reflected );	
+
+	///
+	///	Refraction
+	///
+	float ratio = 1.0 /eta;
+	vec3 refracted = rotation_projection * refract(v_o, TBN*tn, ratio);// TBN*tn, ratio));
+	vec3 rRefr = rotation_projection*refract(v_o, TBN*tn, eta + 0.1);
+    vec3 gRefr = rotation_projection*refract(v_o, TBN*tn, eta);
+    vec3 bRefr = rotation_projection*refract(v_o, TBN*tn, eta - 0.1);
+
+	///
+	/// Chromatic Aberration.	
+	///
+	float fresnelPower = 5.0;
+	float f = ((1.0-eta) * (1.0-eta)) / ((1.0+eta) * (1.0+eta));
+	float mixRatio = ( f + (1.0 - f) * pow((1.0 - dot(-v_o, TBN*tn)), fresnelPower));
+
+	vec4 envCol;
+	vec3 refrCol;
+	vec3 reflCol;
+	vec3 mixed;
+	float perlin;
+	float simplex;
+
+	switch(viewType){
+		//
+		//	Reflection With Texture
+		// 
+		case 0:
+			envCol = texture(cubemap, reflected);
+			pixelcolour = vec4( envCol.rgb*diffuseshadescale+ textureshade*diffuseshadescale, 1.0 );
+			break;
+		//
+		//	Refraction With Texture
+		//
+		case 1:		
+			envCol = texture(cubemap, refracted);
+			pixelcolour = vec4( envCol.rgb*diffuseshadescale + textureshade*diffuseshadescale, 0.75 );
+			break;
+		//
+		//	Reflection Without Texture
+		//
+		case 2:
+			pixelcolour = texture(cubemap, reflected);
+			break;
+		//
+		//	Refraction Without Texture
+		//
+		case 3:
+			pixelcolour = texture(cubemap, refracted);
+			break;
+		//
+		//	Refracting on diffo colours..
+		//
+		case 4:
+			float rCol = texture(cubemap, rRefr).r;
+			float gCol = texture(cubemap, gRefr).g;
+			float bCol = texture(cubemap, bRefr).b;
+			
+			pixelcolour = vec4(rCol,gCol,bCol, 1.0);
+			break;
+		//
+		//	Chromatic Abhoration????	
+		//
+		case 5:
+			refrCol = vec3(texture(cubemap, refracted));
+			reflCol = vec3(texture(cubemap, reflected));
+			mixed = mix(refrCol, reflCol, mixRatio);
+			pixelcolour = vec4(mixed, 1.0);
+			break;
+		///
+		///	Perlin Noise generation.
+		///
+		case 6:
+		    perlin = cnoise(tc_out);
+			pixelcolour = vec4(vec3(1.0,1.0,1.0)*perlin, 1.0);
+
+			break;
+		case 7:
+		    perlin = cnoise(tc_out);
+			vec3 perlinColour = vec3(0.0f);
+			if (perlin < 0.025) {
+				perlinColour = vec3(0.01,0.35,0.05);
+			}
+			else if (perlin >= 0.025 && perlin < 0.1) {
+				perlinColour = vec3(0.85,0.96,0.53);
+			}
+			else if (perlin >= 0.1  && perlin < 0.7 ) {
+				perlinColour = vec3(0.07, 0.6, 0.96);
+			}
+			else if (perlin >= 0.7 && perlin < 0.95 ) {
+				perlinColour = vec3(0.01,0.25,0.95);
+			}
+			else if (perlin >= 0.95  && perlin <= 1.0 ) {
+				perlinColour = vec3(0.01,0.05,0.55);
+			}
+
+			pixelcolour = vec4(perlinColour, 1.0);
+
+			break;
+		
+		//
+		//	Simplex Noise
+		//
+		case 8:
+			simplex = snoise(tc_out);
+			pixelcolour = vec4(vec3(1.0,1.0,1.0)*simplex, 1.0);
+			
+			break;
+		
+		//
+		//  Simplex Noise With Colours Noise
+		//
+		case 9:
+		    simplex = snoise(tc_out);
+			vec3 simplexColour = vec3(0.0f);
+			if (simplex < 0.025) {
+				simplexColour = vec3(0.01,0.35,0.05);
+			}
+			else if (simplex >= 0.025 && simplex < 0.1) {
+				simplexColour = vec3(0.85,0.96,0.53);
+			}
+			else if (simplex >= 0.1  && simplex < 0.7 ) {
+				simplexColour = vec3(0.07, 0.6, 0.96);
+			}
+			else if (simplex >= 0.7 && simplex < 0.95 ) {
+				simplexColour = vec3(0.01,0.25,0.95);
+			}
+			else if (simplex >= 0.95  && simplex <= 1.0 ) {
+				simplexColour = vec3(0.01,0.05,0.55);
+			}
+
+			pixelcolour = vec4(simplexColour, 1.0);
+
+			break;
+			break;
+		//
+		//	No Environment Mapping, just texture and normal map
+		//
+		default:
+			pixelcolour = vec4( vec3(0.5,0.5,0.5)*shadescale+ textureshade*diffuseshadescale, 1.0 );
+			break;
+	}
 
 }
 
-vec3 reflectionAngle(vec3 i, vec3 n) {
+//
+// Simplex 2D noise
+//
+//	Algorithm from: https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
+//
+vec3 permute_simplex(vec3 x) {
+	return mod(((x*34.0)+1.0)*x, 289.0);
+}
+
+float snoise(vec2 v){
+
+	//Scales to 'zoom' in on noise
+	v.x = v.x/scale;
+	v.y = v.y/scale;
+
+	const vec4 C = vec4(0.211324865405187, 0.366025403784439,
+			-0.577350269189626, 0.024390243902439);
+
+	vec2 i  = floor(v + dot(v, C.yy) );
+	vec2 x0 = v -   i + dot(i, C.xx);
+
+	vec2 i1;
+	i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+
+	vec4 x12 = x0.xyxy + C.xxzz;
+	x12.xy -= i1;
+
+	i = mod(i, 289.0);
+	vec3 p = permute_simplex( i.y + vec3(0.0, i1.y, 1.0 ))
+	+ i.x + vec3(0.0, i1.x, 1.0 );
+
+	for(int i = 0; i < permuteCount; ++i) {
+		p = permute_simplex(p);
+	}
+
+	vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy),
+	dot(x12.zw,x12.zw)), 0.0);
+
+	m = m*m ;
+	m = m*m ;
+
+	vec3 x = 2.0 * fract(p * C.www) - 1.0;
+
+	vec3 h = abs(x) - 0.5;
+
+	vec3 ox = floor(x + 0.5);
+
+	vec3 a0 = x - ox;
+
+	m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+
+	vec3 g;
+	g.x  = a0.x  * x0.x  + h.x  * x0.y;
+	g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+
+	return 130.0 * dot(m, g);
+}
+
+
+//	Classic Perlin 2D Noise 
+//	by Stefan Gustavson
+//	Algorithm from: https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
+
+vec2 fade(vec2 t) {
+	return t*t*t*(t*(t*6.0-15.0)+10.0);
+}
+
+vec4 permute(vec4 x){
+	return mod(((x*34.0)+1.0)*x, 289.0);
+}
+
+float cnoise(vec2 P){
+	P.x = P.x/scale;
+	P.y = P.y/scale;
+
+	vec4 Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
+	vec4 Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
+
+	Pi = mod(Pi, 289.0); // To avoid truncation effects in permutation
+	Pi = mod(Pi, 100.0); 
+
+	vec4 ix = Pi.xzxz;
+	vec4 iy = Pi.yyww;
+	vec4 fx = Pf.xzxz;
+	vec4 fy = Pf.yyww;
+
+	vec4 i = permute(ix) + iy;
+	
+	for(int j = 0; j < permuteCount; ++j) {
+		i =  permute(i);
+	}
+
+	vec4 gx = 2.0 * fract(i * 0.0243902439) - 1.0; // 1/41 = 0.024...
+	vec4 gy = abs(gx) - 0.5;
+
+	vec4 tx = floor(gx + 0.5);
+	gx = gx - tx;
+
+	vec2 g00 = vec2(gx.x,gy.x);
+	vec2 g10 = vec2(gx.y,gy.y);
+	vec2 g01 = vec2(gx.z,gy.z);
+	vec2 g11 = vec2(gx.w,gy.w);
+  
+	vec4 norm = 1.79284291400159 - 0.85373472095314 * 
+	vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11));
+
+	g00 *= norm.x;
+	g01 *= norm.y;
+	g10 *= norm.z;
+	g11 *= norm.w;
+
+	float n00 = dot(g00, vec2(fx.x, fy.x));
+	float n10 = dot(g10, vec2(fx.y, fy.y));
+	float n01 = dot(g01, vec2(fx.z, fy.z));
+	float n11 = dot(g11, vec2(fx.w, fy.w));
+
+	vec2 fade_xy = fade(Pf.xy);
+
+	vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
+
+	float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
+
+	return 2.3 * n_xy;
+}
+
+//
+//
+//
+
+
+
+vec3 manualReflect(vec3 i, vec3 n) {
 	return i - 2.0 * dot(n, i) * n;
 }
 
@@ -150,4 +463,39 @@ vec4 bilinear(int LOD,vec2 tcoords)
 	cd.x-=1;//now undo the x to get the last one
 	vec4 c1= texelFetch(mytexture,cd,LOD)*w1;
 	return c3+c1+c2+c0;
+}
+
+
+//
+// Googling for Gaussian Kernel in pixel shader
+// https://github.com/mattdesl/lwjgl-basics/wiki/shaderlesson5//
+
+float blurPerlin(vec2 tc) {
+	vec4 sum = vec4(0.0);
+	float resolution = 0.5;
+	float radius = 0.5;
+	vec2 dir = vec2(1.0f,0.0f);
+
+	float blur = 10.0;//radius/resolution; 
+    
+	//the direction of our blur
+	//(1.0, 0.0) -> x-axis blur
+	//(0.0, 1.0) -> y-axis blur
+	float hstep = dir.x;
+	float vstep = dir.y;
+    
+	//apply blurring, using a 9-tap filter with predefined gaussian weights
+    
+	sum += cnoise(vec2(tc.x - 4.0*blur*hstep, tc.y - 4.0*blur*vstep)) * 0.0162162162;
+	sum += cnoise( vec2(tc.x - 3.0*blur*hstep, tc.y - 3.0*blur*vstep)) * 0.0540540541;
+	sum += cnoise( vec2(tc.x - 2.0*blur*hstep, tc.y - 2.0*blur*vstep)) * 0.1216216216;
+	sum += cnoise(vec2(tc.x - 1.0*blur*hstep, tc.y - 1.0*blur*vstep)) * 0.1945945946;
+	
+	sum += cnoise(vec2(tc.x, tc.y)) * 0.2270270270;
+	
+	sum += cnoise(vec2(tc.x + 1.0*blur*hstep, tc.y + 1.0*blur*vstep)) * 0.1945945946;
+	sum += cnoise(vec2(tc.x + 2.0*blur*hstep, tc.y + 2.0*blur*vstep)) * 0.1216216216;
+	sum += cnoise(vec2(tc.x + 3.0*blur*hstep, tc.y + 3.0*blur*vstep)) * 0.0540540541;
+	sum += cnoise(vec2(tc.x + 4.0*blur*hstep, tc.y + 4.0*blur*vstep)) * 0.0162162162;
+	return sum;
 }

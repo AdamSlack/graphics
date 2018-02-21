@@ -3,9 +3,8 @@ in vec3 pos;
 in vec3 vshade;
 in vec3 normal;
 in vec2 tcoord;
-in vec3 tangent;
-in vec3 bitangent;
-
+uniform vec3 tangent;
+uniform vec3 bitangent;
 
 out vec3 cshade;
 out vec3 v_o;
@@ -24,7 +23,10 @@ uniform vec3 view_in_object_coords;
 
 out vec3 vecTangent;
 out vec3 vecBitangent;
+
+in mat3 tbn;
 out mat3 TBN;
+out vec3 POS;
 
 
 void main()
@@ -43,21 +45,23 @@ void main()
 
     gl_Position.xyz = transpos;
 
+	POS = pos;
     v_o = view_in_object_coords + pos;
     n = normal;
 
     cshade = vshade;
     tc_out = tcoord;
 
-	vecTangent = normalize(tangent);
-	vecBitangent = normalize(bitangent);
-
-	// check handedness of TBN
 	
-	if (dot(cross(normal, vecTangent), vecBitangent) < 0.0f){
+	vecTangent = rotation_projection * tangent;
+	vecBitangent = rotation_projection * bitangent;
+
+	if (dot(cross(rotation_projection * normal, vecTangent), vecBitangent) < 0.0f){
 		vecTangent = vecTangent * -1.0f;
 	}
-	
-	TBN = transpose(mat3(vecTangent, vecBitangent, normal));
+	//vecTangent = normalize(normalize(tangent));
+	//vecBitangent =normalize(normalize(bitangent));
 
+	TBN = transpose(mat3(vecTangent, vecBitangent, rotation_projection*normal));
+	//TBN = tbn;
 }

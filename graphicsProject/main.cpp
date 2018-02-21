@@ -231,6 +231,7 @@ float yRotation = 0.0f;
 float zRotation = 0.0f;
 float fMoveX = 0.0;
 float fMoveY = 0.0;
+float eta = 0.61;
 #if FULLSCREENQUAD // only move back 5 for non fullscreen quads
 	float fMoveZ = 0.0;
 #else
@@ -254,6 +255,7 @@ UINT mynorm_index;
 UINT mytexturesize_index;
 UINT myvshade_index;
 UINT cubemap;
+UINT etaIndex;
 
 int mat3rotation_projectionindex;
 int vec3objcentre_to_eye_projectedindex;
@@ -263,6 +265,14 @@ int vec3view_in_object_coordsindex;
 int pscaleindex;
 int myvmin_index;
 int vmin=0;
+
+int viewType = 0;
+int scale = 40;
+int permuteCount = 2;
+UINT viewTypeIndex;
+UINT scaleIndex;
+UINT permuteCountIndex;
+
 // Map buffer addresses
 float *colourpointer;
 VECTOR centre;
@@ -378,7 +388,7 @@ void Shutdown( );
 void ReadFile(char *filename);
 int set_vertex_arrays(float **arrays,int n_polys, POLYGON *plist);
 void DrawPolygon(POLYGON *p);
-
+void calcBTMat(POLYGON & P);
 // My Functions
 //-----------------------------------------------------------------------------
 // Name:	mip_map_texture_file_read
@@ -885,12 +895,18 @@ bool bInitialiseGLSL( )
 		mytexture_index=glGetUniformLocation( glContext0, "mytexture" );
 		mynorm_index = glGetUniformLocation(glContext0, "mynormal");
 		cubemap = glGetUniformLocation(glContext0, "cubemap");
+
 //		mytexturesize_index=glGetUniformLocation( glContext0, "TexMapSize" );
 		mat3rotation_projectionindex=glGetUniformLocation( glContext0, "rotation_projection" );
 		vec3objcentre_to_eye_projectedindex=glGetUniformLocation( glContext0, "objcentre_to_eye_projected" );
 		vec3centreindex=glGetUniformLocation( glContext0, "centre" );
 		vec3light_in_object_coordsindex=glGetUniformLocation( glContext0, "light_in_object_coords" );
 		vec3view_in_object_coordsindex=glGetUniformLocation( glContext0, "view_in_object_coords" );
+		viewTypeIndex = glGetUniformLocation(glContext0, "viewType");
+		permuteCountIndex = glGetUniformLocation(glContext0, "permuteCount");
+		GLGETERROR("permuteCount ");
+		scaleIndex = glGetUniformLocation(glContext0, "scale");
+		etaIndex = glGetUniformLocation(glContext0, "eta");
 
 		normalmapping = glGetUniformLocation(glContext0, "normalmapping");
 	
@@ -908,8 +924,14 @@ bool bInitialiseGLSL( )
 		glBindBuffer(GL_ARRAY_BUFFER,vertexbuffer);//bind as an array buffer
 		glBindAttribLocation( glContext0,1, "vshade");
 		normalindex=glGetAttribLocation( glContext0,"normal");
-		glBindAttribLocation(glContext0, 4, "tangent");
-		glBindAttribLocation(glContext0, 5, "bitangent");
+
+		tangentindex = glGetUniformLocation(glContext0, "tangent");// normalindex + 2;
+		bitangentindex = glGetUniformLocation(glContext0, "bitangent");// tangentindex + 1;
+		//glBindAttribLocation(glContext0, tangentindex, "tangent");
+		//glBindAttribLocation(glContext0, bitangentindex, "bitangent");
+
+		
+
 		tcoordindex = glGetAttribLocation(glContext0, "tcoord");
 
 			GLGETERROR( "glGetAttribLocation-c" );
@@ -957,7 +979,7 @@ bool bInitialiseGLSL( )
 			GLGETERROR("GenBuffers");
 		glBindBuffer(GL_ARRAY_BUFFER, tangentbuffer);//bind as an array buffer
 			GLGETERROR("bufferdata3");
-		glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(tangentindex, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			GLGETERROR("bufferdata4");
 		glBufferData(GL_ARRAY_BUFFER, 3 * polyarraysizes * sizeof(GLfloat), polyarrays[4], GL_STATIC_DRAW);
 			GLGETERROR("bufferdata5");
@@ -968,9 +990,9 @@ bool bInitialiseGLSL( )
 			GLGETERROR("GenBuffers");
 		glBindBuffer(GL_ARRAY_BUFFER, bitangentbuffer);//bind as an array buffer
 			GLGETERROR("bufferdata3");
-		glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(bitangentindex, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			GLGETERROR("bufferdata4");
-		glBufferData(GL_ARRAY_BUFFER, 3 * polyarraysizes * sizeof(GLfloat), polyarrays[4], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 3 * polyarraysizes * sizeof(GLfloat), polyarrays[5], GL_STATIC_DRAW);
 			GLGETERROR("bufferdata5");
 		glEnableVertexAttribArray(5);
 			GLGETERROR("bufferdata6");
@@ -1086,6 +1108,11 @@ void RenderScene( )
 		glUniform1f( pscaleindex, pscale);
 		glUniform1i( myvmin_index, vmin);
 
+		glUniform1i(viewTypeIndex, viewType);
+		glUniform1i(scaleIndex, scale);
+
+		glUniform1i(permuteCountIndex, permuteCount);
+		GLGETERROR("permuteCount");
 
 	
 	//--------------------------------
@@ -1093,10 +1120,11 @@ void RenderScene( )
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );   
 	GLGETERROR( "RenderScene2" );
 
+
 	for (int i=0;i<m_iNumOfPolys;i++)
 	{
 		DrawPolygon(&polylist[i]);
-
+		calcBTMat(polylist[i]);
 		//test evaluation of vertex shader code for debugging
 		VECTOR v,h,l,n;
 		v=Normalise(viewobj);
@@ -1275,6 +1303,12 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam 
 
 			filterwidth*=1.1;
 			break;
+		case VK_N:
+			viewType -= 1;
+			break;
+		case VK_M:
+			viewType += 1;
+			break;
 		case VK_F:
 			vmin--;
 			if (vmin<0) vmin=0;
@@ -1294,6 +1328,12 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam 
 		case VK_DOWN:
 			fMoveY--;
 			break;
+		case VK_J:
+			eta -= 0.1;
+			break;
+		case VK_K:
+			eta += 0.1;
+			break;
 		case VK_OEM_COMMA:
 			nearplane--;
 			normalmapping+=1; //= !normalmapping;
@@ -1303,10 +1343,10 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam 
 			normalmapping-=1;
 			break;
 		case VK_ADD:
-			fMoveZ+=1;
+			fMoveZ+=10;
 			break;
 		case VK_SUBTRACT:
-			fMoveZ -=1;
+			fMoveZ -=10;
 			break;
 		case VK_1:
 			vang=3.14159/4;
@@ -1323,7 +1363,21 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam 
 		case VK_0:
 				vang=0;
 				break;
-
+		case VK_8:
+			scale -= 1;
+			break;
+		case VK_9:
+			scale += 1;
+			break;
+		case VK_7:
+			permuteCount += 1;
+			break;
+		case VK_6:
+			permuteCount -= 1;
+			if (permuteCount < 2) {
+				permuteCount = 2;
+			}
+			break;
 		}
 		break;
 	case WM_LBUTTONDOWN:
@@ -1517,26 +1571,26 @@ void calcBTMat(POLYGON & P) {
 	P.tangent.x = det * ((t2*Q1.x) + (-t1*Q2.x));
 	P.tangent.y = det * ((t2*Q1.y) + (-t1*Q2.y));
 	P.tangent.z = det * ((t2*Q1.z) + (-t1*Q2.z));
-	
+
 	P.bitangent.x = det * ((-s2*Q1.x) + (s1*Q2.x));
 	P.bitangent.y = det * ((-s2*Q1.y) + (s1*Q2.y));
 	P.bitangent.z = det * ((-s2*Q1.z) + (s1*Q2.z));
-
+	/*
 	// issue here.
-	float tLength = (float) sqrt(Dot(P.tangent, P.tangent));
+	float tLength = (float)sqrt(Dot(P.tangent, P.tangent));
 	P.tangent.x /= tLength;
 	P.tangent.y /= tLength;
 	P.tangent.z /= tLength;
 
-	float bLength = (float) sqrt(Dot(P.bitangent, P.bitangent));
+	float bLength = (float)sqrt(Dot(P.bitangent, P.bitangent));
 	P.bitangent.x /= bLength;
 	P.bitangent.y /= bLength;
 	P.bitangent.z /= bLength;
-
-
+	*/
+	/*
 	// using method from NOW...
 	VECTOR p = P.vert[0];
-	VECTOR q = P.vert[1];
+	VECTOR q = P.vert[3];
 	TEXCOORD tp = P.texPos[0];
 	TEXCOORD tq = P.texPos[3];
 
@@ -1558,10 +1612,12 @@ void calcBTMat(POLYGON & P) {
 	btngt.x = diff.x * yDiff;
 	btngt.y = diff.y * yDiff;
 	btngt.z = diff.z * yDiff;
-	
+
 	P.tangent = tngt;
 	P.bitangent = btngt;
 
+	P.normal = P.normal;
+	//*/
 }
 
 //-----------------------------------------------------------------------------
@@ -1766,6 +1822,7 @@ void DrawPolygon(POLYGON *p)
 	glUniform1i(mytexture_index,/*GL_TEXTURE0+*/p->texindex);
 	glUniform1i(mynorm_index, p->normindex);
 	glUniform1i(cubemap, 0);
+	glUniform1f(etaIndex, eta);
 
 //	glUniform2fv(mytexturesize_index,1,(float *)(&(p->texsize)));
     GLGETERROR( "Drawpoly2" );

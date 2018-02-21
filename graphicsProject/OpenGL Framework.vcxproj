@@ -14,7 +14,7 @@
     <ProjectGuid>{7C8EC7AC-8FE0-45AF-94CB-0088A563AFA5}</ProjectGuid>
     <RootNamespace>OpenGLFloatsfromashader</RootNamespace>
     <Keyword>ManagedCProj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
