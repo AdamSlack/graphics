@@ -83,7 +83,7 @@ void main()
 	vec3 tn;
 	tn.x = dot(vecTangent, normalshade);
 	tn.y = dot(vecBitangent, normalshade);
-	tn.z = dot(n, normalshade);
+	tn.z = dot(rotation_projection*n, normalshade);
 
 	
 	//tn = normalize(tn);
@@ -101,29 +101,36 @@ void main()
 	tn_v.y = dot(vecBitangent, v_o);
 	tn_v.z = dot(n, v_o);
 
-	vn=normalize(tn_v);
-	//vn=normalize(v_o);
-  	//ln=normalize(locallight_o);
+	//vn=normalize(tn_v);
+	//ln=normalize(tn_l);
+	vn=normalize(v_o);
+  	ln=normalize(locallight_o);
 
 	h=vn-ln;//light direction shines from source to object
     h=normalize(h); 
     nn=normalize(n);
-    shadescale= dot(h,tn);//inward normal
+    shadescale= dot(h,TBN*tn);//inward normal
 
     if (shadescale<0){
 		shadescale=0;
 	}
     shadescale*=shadescale;
 	shadescale*=shadescale;
+	shadescale*=shadescale;
+	shadescale*=shadescale;
 
-	float diffuseshadescale=dot(transpose(TBN)*-ln,tn);
+
+	float diffuseshadescale=dot(-ln,TBN*tn);
 	if (diffuseshadescale<0)diffuseshadescale=0;
-	
+	diffuseshadescale = clamp(diffuseshadescale+shadescale,0.0, 1.0);
+	//
+	//	Specular
+	//
 
 	///
 	///	Reflection
 	///
-	vec3 reflected = normalize(manualReflect(v_o, TBN*tn));// TBN*tn));
+	vec3 reflected = rotation_projection * manualReflect(v_o, TBN*tn);// TBN*tn));
 	//reflected = normalize(reflect(rotation_projection*v_o, nn ));
 	//reflected = normalize( reflected );	
 
@@ -131,18 +138,17 @@ void main()
 	///	Refraction
 	///
 	float ratio = 1.0 /eta;
-	vec3 refracted = normalize(refract(v_o, TBN*tn, ratio));// TBN*tn, ratio));
+	vec3 refracted = rotation_projection * refract(v_o, TBN*tn, ratio);// TBN*tn, ratio));
 	vec3 rRefr = rotation_projection*refract(v_o, TBN*tn, eta + 0.1);
     vec3 gRefr = rotation_projection*refract(v_o, TBN*tn, eta);
     vec3 bRefr = rotation_projection*refract(v_o, TBN*tn, eta - 0.1);
 
 	///
-	/// Chromatic Abhoration.	
+	/// Chromatic Aberration.	
 	///
 	float fresnelPower = 5.0;
 	float f = ((1.0-eta) * (1.0-eta)) / ((1.0+eta) * (1.0+eta));
 	float mixRatio = ( f + (1.0 - f) * pow((1.0 - dot(-v_o, TBN*tn)), fresnelPower));
-
 
 	vec4 envCol;
 	vec3 refrCol;
@@ -157,14 +163,14 @@ void main()
 		// 
 		case 0:
 			envCol = texture(cubemap, reflected);
-			pixelcolour = vec4( envCol.rgb*shadescale+ textureshade*shadescale, 1.0 );
+			pixelcolour = vec4( envCol.rgb*diffuseshadescale+ textureshade*diffuseshadescale, 1.0 );
 			break;
 		//
 		//	Refraction With Texture
 		//
 		case 1:		
 			envCol = texture(cubemap, refracted);
-			pixelcolour = vec4( envCol.rgb*shadescale+ textureshade*shadescale, 1.0 );
+			pixelcolour = vec4( envCol.rgb*diffuseshadescale + textureshade*diffuseshadescale, 0.75 );
 			break;
 		//
 		//	Reflection Without Texture
@@ -267,7 +273,7 @@ void main()
 		//	No Environment Mapping, just texture and normal map
 		//
 		default:
-			pixelcolour = vec4( envCol.rgb*shadescale+ textureshade*shadescale, 1.0 );
+			pixelcolour = vec4( vec3(0.5,0.5,0.5)*shadescale+ textureshade*diffuseshadescale, 1.0 );
 			break;
 	}
 
@@ -359,7 +365,11 @@ float cnoise(vec2 P){
 	vec4 fx = Pf.xzxz;
 	vec4 fy = Pf.yyww;
 
-	vec4 i = permute(permute(ix) + iy);
+	vec4 i = permute(ix) + iy;
+	
+	for(int j = 0; j < permuteCount; ++j) {
+		i =  permute(i);
+	}
 
 	vec4 gx = 2.0 * fract(i * 0.0243902439) - 1.0; // 1/41 = 0.024...
 	vec4 gy = abs(gx) - 0.5;

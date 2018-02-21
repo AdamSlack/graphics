@@ -3,8 +3,8 @@ in vec3 pos;
 in vec3 vshade;
 in vec3 normal;
 in vec2 tcoord;
-in vec3 tangent;
-in vec3 bitangent;
+uniform vec3 tangent;
+uniform vec3 bitangent;
 
 out vec3 cshade;
 out vec3 v_o;
@@ -52,21 +52,16 @@ void main()
     cshade = vshade;
     tc_out = tcoord;
 
-	// check handedness of TBN
+	
+	vecTangent = rotation_projection * tangent;
+	vecBitangent = rotation_projection * bitangent;
 
-	//orthogonalise
-	vecTangent = normalize(vecTangent-normal * dot(vecTangent,normal));
-	vecBitangent = normalize(vecBitangent-normal * dot(vecBitangent,normal));
-
-	vecTangent = normalize(rotation_projection * normalize(tangent));
-	vecBitangent = normalize(rotation_projection * normalize(bitangent));
-
-	if (dot(cross(normal, vecTangent), vecBitangent) < 0.0f){
+	if (dot(cross(rotation_projection * normal, vecTangent), vecBitangent) < 0.0f){
 		vecTangent = vecTangent * -1.0f;
 	}
 	//vecTangent = normalize(normalize(tangent));
 	//vecBitangent =normalize(normalize(bitangent));
 
-	TBN = transpose(mat3(vecTangent, vecBitangent, normal));
+	TBN = transpose(mat3(vecTangent, vecBitangent, rotation_projection*normal));
 	//TBN = tbn;
 }

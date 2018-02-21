@@ -924,8 +924,14 @@ bool bInitialiseGLSL( )
 		glBindBuffer(GL_ARRAY_BUFFER,vertexbuffer);//bind as an array buffer
 		glBindAttribLocation( glContext0,1, "vshade");
 		normalindex=glGetAttribLocation( glContext0,"normal");
-		glBindAttribLocation(glContext0, 4, "tangent");
-		glBindAttribLocation(glContext0, 5, "bitangent");
+
+		tangentindex = glGetUniformLocation(glContext0, "tangent");// normalindex + 2;
+		bitangentindex = glGetUniformLocation(glContext0, "bitangent");// tangentindex + 1;
+		//glBindAttribLocation(glContext0, tangentindex, "tangent");
+		//glBindAttribLocation(glContext0, bitangentindex, "bitangent");
+
+		
+
 		tcoordindex = glGetAttribLocation(glContext0, "tcoord");
 
 			GLGETERROR( "glGetAttribLocation-c" );
@@ -973,7 +979,7 @@ bool bInitialiseGLSL( )
 			GLGETERROR("GenBuffers");
 		glBindBuffer(GL_ARRAY_BUFFER, tangentbuffer);//bind as an array buffer
 			GLGETERROR("bufferdata3");
-		glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(tangentindex, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			GLGETERROR("bufferdata4");
 		glBufferData(GL_ARRAY_BUFFER, 3 * polyarraysizes * sizeof(GLfloat), polyarrays[4], GL_STATIC_DRAW);
 			GLGETERROR("bufferdata5");
@@ -984,9 +990,9 @@ bool bInitialiseGLSL( )
 			GLGETERROR("GenBuffers");
 		glBindBuffer(GL_ARRAY_BUFFER, bitangentbuffer);//bind as an array buffer
 			GLGETERROR("bufferdata3");
-		glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(bitangentindex, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			GLGETERROR("bufferdata4");
-		glBufferData(GL_ARRAY_BUFFER, 3 * polyarraysizes * sizeof(GLfloat), polyarrays[4], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 3 * polyarraysizes * sizeof(GLfloat), polyarrays[5], GL_STATIC_DRAW);
 			GLGETERROR("bufferdata5");
 		glEnableVertexAttribArray(5);
 			GLGETERROR("bufferdata6");
@@ -1569,7 +1575,7 @@ void calcBTMat(POLYGON & P) {
 	P.bitangent.x = det * ((-s2*Q1.x) + (s1*Q2.x));
 	P.bitangent.y = det * ((-s2*Q1.y) + (s1*Q2.y));
 	P.bitangent.z = det * ((-s2*Q1.z) + (s1*Q2.z));
-
+	/*
 	// issue here.
 	float tLength = (float)sqrt(Dot(P.tangent, P.tangent));
 	P.tangent.x /= tLength;
@@ -1580,7 +1586,7 @@ void calcBTMat(POLYGON & P) {
 	P.bitangent.x /= bLength;
 	P.bitangent.y /= bLength;
 	P.bitangent.z /= bLength;
-
+	*/
 	/*
 	// using method from NOW...
 	VECTOR p = P.vert[0];
